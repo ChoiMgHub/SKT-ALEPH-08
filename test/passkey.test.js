@@ -176,3 +176,22 @@ test('migrations repeat without data loss; deletion is confined to authenticated
     assert.equal(x.raw.prepare('SELECT COUNT(*) n FROM credentials').get().n, 1);
   } finally { x.close(); }
 });
+test('session reports the credential that authenticated it, not the latest-added key or client-supplied selection', async () => {
+  const x = await context();
+  try {
+    const a = x.browser(), { key: one, result } = await signup(a, 'fixture_a'), two = new SoftwareAuthenticator();
+    const firstID = result.data.credential.id;
+    assert.equal((await a.api('/api/auth/me')).data.credential.id, firstID);
+    const p = await a.api('/api/auth/registration/options', 'POST', { mode: 'add', name: '내 예비 키', provider: '기타·확인 필요' });
+    const add = await a.api('/api/auth/registration/verify', 'POST', { mode: 'add', ceremonyId: p.data.ceremonyId, response: two.register(p.data.options, x.env.ORIGIN) });
+    assert.equal(add.status, 201);
+    assert.equal((await a.api('/api/auth/me')).data.credential.id, firstID, 'adding a key is not logging in with it');
+    await a.api('/api/auth/logout', 'POST', {});
+    assert.equal((await a.api('/api/auth/me')).status, 401);
+    assert.equal((await login(a, two)).result.status, 200);
+    const me = await a.api('/api/auth/me?credential_id=' + firstID, 'GET', undefined, { headers: { 'X-Credential-ID': firstID } });
+    assert.deepEqual(me.data.credential, { id: add.data.credential.id, name: '내 예비 키' });
+    assert.equal((await login(a, one)).result.status, 200);
+    assert.equal((await a.api('/api/auth/me')).data.credential.id, firstID);
+  } finally { x.close(); }
+});

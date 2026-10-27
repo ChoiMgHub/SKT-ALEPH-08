@@ -8,6 +8,7 @@ export async function verify(x) {
   check('취소할 등록 질문 발급', beforeRegistration.status, 200);
   check('등록 취소', (await a.api('/api/auth/cancel', 'POST', { ceremonyId: beforeRegistration.data.ceremonyId })).status, 200);
   const A = await signup(a, 'fixture_a'); check('A 등록 검증 성공', A.result.status, 201);
+  check('A 세션에 실제 등록 인증 키 표시', (await a.api('/api/auth/me')).data.credential.id, A.result.data.credential.id);
   const B = await signup(b, 'fixture_b'); check('B 등록 검증 성공', B.result.status, 201);
   check('등록마다 새 질문', A.pending.data.options.challenge === B.pending.data.options.challenge, false);
   const aData = (await a.api('/api/private')).data, bData = (await b.api('/api/private')).data;
@@ -53,6 +54,7 @@ export async function verify(x) {
   check('첫 번째 키 삭제', (await a.api('/api/credentials/' + firstID, 'DELETE')).status, 200);
   const removed = await login(a, A.key); check('삭제한 키 로그인 거부', removed.result.status, 401);
   const remains = await login(a, second); check('남은 키 로그인 허용', remains.result.status, 200);
+  check('예비 키 로그인 뒤 실제 인증 키 표시', (await a.api('/api/auth/me')).data.credential.id, add.data.credential.id);
   pairs.push({ category: '패스키 삭제 뒤 로그인', allowStatus: remains.result.status, denyStatus: removed.result.status,
     allow: '같은 계정에 남아 있는 예비 키', deny: '서버에서 삭제한 이전 키' });
   check('마지막 키 삭제 차단', (await a.api('/api/credentials/' + secondID, 'DELETE')).status, 409);

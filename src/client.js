@@ -14,7 +14,7 @@ export function mount({ doc = document, fetcher = fetch, register = startRegistr
   };
   function clearPrivate(clearJournal = true) {
     generation++; currentUser = null; doc.defaultView.clearTimeout(timer);
-    $('items').replaceChildren(); $('credentials').replaceChildren(); $('account-label').textContent = '';
+    $('items').replaceChildren(); $('credentials').replaceChildren(); $('account-label').textContent = ''; $('current-key').textContent = '';
     $('private-panel').hidden = true; $('anonymous-panel').hidden = false;
     $('item-form').reset(); $('add-key-form').reset();
     if (clearJournal) evidence = [];
@@ -81,6 +81,7 @@ export function mount({ doc = document, fetcher = fetch, register = startRegistr
       element('p', `등록: ${new Date(key.registeredAt).toLocaleString('ko-KR')} · 저장소(직접 선택): ${key.provider}`, card);
       const details = element('details', undefined, card); element('summary', '서버에 저장된 공개키 보기', details);
       element('pre', key.publicKey, details); element('p', 'base64url 형식의 COSE 공개키입니다. 개인키·비밀번호가 아닙니다.', details);
+      action('이 패스키로 로그인 확인', () => loginWithKey(key), card);
       action('이 패스키 삭제', async () => {
         if (!doc.defaultView.confirm('이 키로 더 이상 로그인할 수 없게 됩니다. 삭제할까요?')) return;
         const result = await api('/api/credentials/' + encodeURIComponent(key.id), 'DELETE');
@@ -99,6 +100,7 @@ export function mount({ doc = document, fetcher = fetch, register = startRegistr
     const [data, keys] = await Promise.all([api('/api/private'), api('/api/credentials')]);
     if (ticket !== generation) return;
     $('account-label').textContent = `비공개 공간 · ${me.user.username}`;
+    $('current-key').textContent = `이번 로그인에 사용한 패스키: ${me.credential.name}`;
     showItems(data.items); showCredentials(keys.credentials);
     $('anonymous-panel').hidden = true; $('private-panel').hidden = false;
     doc.defaultView.clearTimeout(timer);
@@ -124,16 +126,26 @@ export function mount({ doc = document, fetcher = fetch, register = startRegistr
   }
   $('signup-form').addEventListener('submit', e => { e.preventDefault(); const form = e.currentTarget; perform(() => registration(form, 'signup')); });
   $('add-key-form').addEventListener('submit', e => { e.preventDefault(); const form = e.currentTarget; perform(() => registration(form, 'add'), 'add-key-status'); });
-  $('login-btn').addEventListener('click', () => perform(async () => {
+  async function loginWithKey(key = null) {
     if (!supported()) throw new Error('패스키를 지원하는 브라우저에서 HTTPS 주소로 접속하세요.');
-    clearPrivate(); status('기기에서 로그인할 패스키를 선택하세요.');
+    if (key && currentUser) restoreOnVisible = true;
+    clearPrivate(); status(key ? `선택한 패스키 '${key.name}'로 로그인하는지 확인합니다. 기기의 저장소 선택 화면을 확인하세요.` : '기기에서 로그인할 패스키를 선택하세요.');
+    $('status').scrollIntoView?.({ block: 'center' });
     const pending = await api('/api/auth/login/options', 'POST', {});
+    // 사용자 선택을 돕는 브라우저 필터이다. 서버의 서명·세션 검증을 대신하지 않는다.
+    const options = key ? { ...pending.options, allowCredentials: [{ id: key.id, type: 'public-key' }] } : pending.options;
     let response;
-    try { response = await authenticate({ optionsJSON: pending.options }); }
-    catch { await api('/api/auth/cancel', 'POST', { ceremonyId: pending.ceremonyId }).catch(() => {}); throw new Error('로그인을 완료하지 않았습니다. 기기의 선택 창을 확인하고 다시 시도하세요.'); }
+    try {
+      response = await authenticate({ optionsJSON: options });
+      if (key && response.id !== key.id) throw new Error('다른 키가 선택됨');
+    } catch {
+      await api('/api/auth/cancel', 'POST', { ceremonyId: pending.ceremonyId }).catch(() => {});
+      throw new Error(key ? `선택한 '${key.name}'로 인증하지 못했습니다. 해당 키가 있는 저장소를 선택하고 다시 시도하세요. 기존 키를 삭제하지 마세요.` : '로그인을 완료하지 않았습니다. 기기의 선택 창을 확인하고 다시 시도하세요.');
+    }
     await api('/api/auth/login/verify', 'POST', { ceremonyId: pending.ceremonyId, response });
-    await refresh(); status('패스키로 로그인했습니다.');
-  }));
+    await refresh(); status('패스키로 로그인했습니다.'); $('current-key').scrollIntoView?.({ block: 'center' });
+  }
+  $('login-btn').addEventListener('click', () => perform(() => loginWithKey()));
   $('logout-btn').addEventListener('click', () => perform(async () => {
     // 요청 실패여도 먼저 표시와 메모리를 비운다. 성공을 가장하지는 않는다.
     clearPrivate();

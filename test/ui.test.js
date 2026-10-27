@@ -110,3 +110,50 @@ test('device window rejection displays inline and restores private UI after visi
     assert.equal(ui.doc.querySelectorAll('#credentials article').length, 1);
   } finally { ui?.dom.window.close(); x.close(); }
 });
+test('UI identifies the actual login key, keeps it on key addition, switches on login and clears on logout', async () => {
+  const x = await context(); let ui;
+  try {
+    const browser = x.browser(); await signup(browser, 'fixture_a'); const two = new SoftwareAuthenticator();
+    ui = await app(x, browser, { register: async ({ optionsJSON }) => two.register(optionsJSON, x.env.ORIGIN),
+      authenticate: async ({ optionsJSON }) => two.login(optionsJSON, x.env.ORIGIN) });
+    assert.match(ui.doc.getElementById('current-key').textContent, /자동 시험 기본 키/);
+    const form = ui.doc.getElementById('add-key-form'); form.elements.name.value = '내 예비 키'; form.elements.provider.value = '기타·확인 필요';
+    form.dispatchEvent(new ui.dom.window.Event('submit', { cancelable: true })); await settled(ui.doc);
+    assert.match(ui.doc.getElementById('current-key').textContent, /자동 시험 기본 키/);
+    ui.doc.getElementById('logout-btn').click(); await settled(ui.doc);
+    assert.equal(ui.doc.getElementById('current-key').textContent, '');
+    ui.doc.getElementById('login-btn').click(); await settled(ui.doc);
+    assert.equal(ui.doc.getElementById('current-key').textContent, '이번 로그인에 사용한 패스키: 내 예비 키');
+  } finally { ui?.dom.window.close(); x.close(); }
+});
+test('key-specific login requests only the selected credential and displays the server-confirmed key', async () => {
+  const x = await context(); let ui;
+  try {
+    const browser = x.browser(); await signup(browser, 'fixture_a'); const two = new SoftwareAuthenticator();
+    let allowed;
+    ui = await app(x, browser, { register: async ({ optionsJSON }) => two.register(optionsJSON, x.env.ORIGIN),
+      authenticate: async ({ optionsJSON }) => { allowed = optionsJSON.allowCredentials; return two.login(optionsJSON, x.env.ORIGIN); } });
+    const form = ui.doc.getElementById('add-key-form'); form.elements.name.value = '선택할 예비 키'; form.elements.provider.value = '기타·확인 필요';
+    form.dispatchEvent(new ui.dom.window.Event('submit', { cancelable: true })); await settled(ui.doc);
+    const card = [...ui.doc.querySelectorAll('#credentials article')].find(n => n.textContent.includes('선택할 예비 키'));
+    [...card.querySelectorAll('button')].find(b => b.textContent === '이 패스키로 로그인 확인').click(); await settled(ui.doc);
+    assert.deepEqual(allowed, [{ id: Buffer.from(two.id).toString('base64url'), type: 'public-key' }]);
+    assert.equal(ui.doc.getElementById('current-key').textContent, '이번 로그인에 사용한 패스키: 선택할 예비 키');
+    assert.equal(ui.doc.getElementById('private-panel').hidden, false);
+  } finally { ui?.dom.window.close(); x.close(); }
+});
+test('key-specific login cannot claim success using another key and restores the previous session', async () => {
+  const x = await context(); let ui;
+  try {
+    const browser = x.browser(), { key: one } = await signup(browser, 'fixture_a'), two = new SoftwareAuthenticator();
+    ui = await app(x, browser, { register: async ({ optionsJSON }) => two.register(optionsJSON, x.env.ORIGIN),
+      authenticate: async ({ optionsJSON }) => one.login(optionsJSON, x.env.ORIGIN) });
+    const form = ui.doc.getElementById('add-key-form'); form.elements.name.value = '선택할 예비 키'; form.elements.provider.value = '기타·확인 필요';
+    form.dispatchEvent(new ui.dom.window.Event('submit', { cancelable: true })); await settled(ui.doc);
+    const card = [...ui.doc.querySelectorAll('#credentials article')].find(n => n.textContent.includes('선택할 예비 키'));
+    [...card.querySelectorAll('button')].find(b => b.textContent === '이 패스키로 로그인 확인').click(); await settled(ui.doc);
+    assert.match(ui.doc.getElementById('status').textContent, /인증하지 못했습니다/);
+    assert.match(ui.doc.getElementById('current-key').textContent, /자동 시험 기본 키/);
+    assert.equal(ui.doc.getElementById('private-panel').hidden, false);
+  } finally { ui?.dom.window.close(); x.close(); }
+});

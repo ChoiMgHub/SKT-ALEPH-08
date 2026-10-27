@@ -65,7 +65,7 @@ function keyMeta(input) {
 async function session(req, db, cfg, now, required = true) {
   const token = cookie(req, cfg.sessionName);
   const tokenHash = token ? await hash(token) : '';
-  const value = tokenHash && await first(db, `SELECT s.*, u.username FROM sessions s
+  const value = tokenHash && await first(db, `SELECT s.*, u.username, c.name AS credential_name FROM sessions s
     JOIN users u ON u.id=s.user_id JOIN credentials c ON c.id=s.credential_id AND c.user_id=s.user_id
     WHERE s.token_hash=? AND s.expires_at>?`, tokenHash, now);
   if (!value && required) fail(401, '패스키로 로그인하세요.');
@@ -131,7 +131,9 @@ async function api(req, env, cfg, now) {
   }
   if (path === '/api/auth/me' && req.method === 'GET') {
     const s = await session(req, db, cfg, now);
-    return json({ user: { id: s.user_id, username: s.username }, expiresAt: new Date(s.expires_at).toISOString() });
+    return json({ user: { id: s.user_id, username: s.username },
+      credential: { id: s.credential_id, name: s.credential_name },
+      expiresAt: new Date(s.expires_at).toISOString() });
   }
   if (path === '/api/auth/registration/options' && req.method === 'POST') {
     const input = await body(req), meta = keyMeta(input);
