@@ -1,0 +1,92 @@
+# SKT-ALEPH-08 · 내 소개 페이지에 패스키 달기
+
+과제 1의 공개 소개 `index.html`에 계정별 비공개 메모와 패스키 등록·로그인·관리를 추가한다. 비공개 메모는 서버의 로그인·소유권 검사를 통과한 뒤에만 내려온다. 사이트 비밀번호는 만들지 않는다.
+
+**현재 단계: 구현과 격리 자동 검증 완료 / 사용자 운영 배포와 갤럭시 실기기 확인은 아직.** 자동 시험 결과를 실기기 사용 결과로 적지 않는다.
+
+## 기반과 자원
+
+- 기반: [T01 고정 커밋](https://github.com/ChoiMgHub/SKT-ALEPH-01/tree/89fabfcff6c9a2a07dc4350fa0858f35060bdefb)
+- 저장소·브랜치: `ChoiMgHub/SKT-ALEPH-08` / `task-08`
+- Worker: `skt-aleph-08`
+- D1: `aleph-profile-08` / `e1d1418e-bac5-44f6-9f8a-31e7d6a54998` / binding `DB`
+- 설정된 배포 주소: `https://skt-aleph-08.mingi85308530.workers.dev` (**배포 후 접속 확인 필요**)
+
+기존 공개 소개의 본문·활동·근거 링크는 유지했다. 실제 연락 이메일은 `contact@example.invalid`로 바꾸고 가상 연락처임을 표시했다. 기존 공개 소개의 이름·학습 배경은 남아 있으며, 비공개 메모는 모두 가상 자료다. 과제 1 저장소는 수정하지 않는다.
+
+## Windows PowerShell · 처음 실행
+
+Node 24 이상과 npm을 사용한다. 학원 PC의 Windows 계정·암호·PIN을 바꾸지 않는다. 아래 블록은 실패하면 이후 명령을 실행하지 않는다.
+
+```powershell
+cd "$HOME\Documents\Aleph_Choi\SKT-ALEPH-08"
+& {
+  git pull --ff-only
+  if ($LASTEXITCODE -ne 0) { throw "소스 업데이트 실패" }
+  npm.cmd ci
+  if ($LASTEXITCODE -ne 0) { throw "의존성 설치 실패" }
+  npm.cmd test
+  if ($LASTEXITCODE -ne 0) { throw "자동 테스트 실패" }
+  npm.cmd run build
+  if ($LASTEXITCODE -ne 0) { throw "빌드 실패" }
+}
+```
+
+### 갤럭시에서 시험하기 위한 HTTPS 배포
+
+```powershell
+& {
+  npm.cmd run db:remote
+  if ($LASTEXITCODE -ne 0) { throw "DB 준비 실패: 배포를 중단합니다" }
+  npm.cmd run deploy
+  if ($LASTEXITCODE -ne 0) { throw "배포 실패" }
+}
+```
+
+DB 명령의 진행 질문에는 대상이 **aleph-profile-08**인지 확인하고 `y`. `schema.sql`은 `CREATE ... IF NOT EXISTS`이며 기존 자료를 삭제하지 않는다. T06·T07 DB에는 실행하지 않는다. API 인증 오류가 나면 `npx.cmd wrangler logout`, `npx.cmd wrangler login` 후 실패한 DB 명령부터 재시도한다. 비밀 파일이나 AUTH_PEPPER 설정은 이 과제에 필요하지 않다. Worker 주소·RP ID는 `wrangler.jsonc`의 고정 주소를 사용한다. 다른 주소로 바꾸면 그 주소에서 패스키를 새로 등록해야 한다.
+
+### 선택: PC 로컬 개발
+
+```powershell
+npm.cmd run setup:local
+npm.cmd run db:local
+npm.cmd run dev
+```
+
+`http://localhost:8787`로 접속한다. 이 주소는 해당 PC에서만 열린다. 갤럭시에서 `localhost`를 입력하면 갤럭시 자신을 뜻하므로, 실제 기기 시험은 **배포된 HTTPS 주소**를 사용한다. `.dev.vars`는 로컬 주소 설정이며 Git에 올리지 않는다. 로컬과 배포 주소에 등록한 패스키는 별개다.
+
+## 실제 사용 순서
+
+1. 배포 주소를 갤럭시 Chrome에서 열기. 공개 소개는 로그인 없이 보인다.
+2. 아래의 '처음 사용하나요?'를 펼쳐 실명·이메일 대신 `learner_a` 같은 가상 아이디를 입력한다. 키 이름과 실제로 선택할 저장소를 기록하고 패스키를 등록한다.
+3. 기기가 표시하는 등록 창에서 Google 비밀번호 관리자 등 지원 저장소를 확인한다. 앱의 저장소 선택란은 기록용이다. 사이트가 지문·PIN·패턴 원본을 받지 않는다.
+4. 로그인 후 가상 메모 3개, 패스키 이름·등록 날짜·저장 공개키를 확인한다. 로그아웃하고 같은 키로 다시 로그인한다.
+5. 두 번째 별도 패스키를 같은 계정에 추가한다. 기기가 다른 저장소를 지원하는지 확인한다. 같은 키가 동기화되어 다른 기기에도 보이는 것은 별도 키가 아니다. **갤럭시에서 별도 두 키를 만들 수 있는지는 아직 확인하지 않았다.** 지원하지 않으면 다른 개인 기기·지원 저장소를 확보해야 한다. 가상 인증기를 실제 키로 가장하지 않는다.
+6. 계정 B를 따로 만들어 자료 분리 시험을 한다. '같은 계정의 두 키'와 '서로 다른 두 계정'은 별도 시험이다.
+
+키 추가·삭제는 마지막 로그인 후 5분 이내에 한다. 시간이 지나면 로그아웃 후 재로그인한다. 로그인에 사용한 키를 삭제하면 그 키로 만든 세션도 회수되어 즉시 로그아웃된다. 남은 키로 다시 로그인한다. 마지막 키 삭제는 차단한다. 모든 키와 제공자 복구 수단을 잃으면 이 앱은 기존 계정을 복구하지 못한다.
+
+## 시험·증거
+
+- `npm.cmd test`: 실제 검증 라이브러리와 SQLite를 통한 서버·UI 자동 시험. 지문 센서 시험은 아니다.
+- `npm.cmd run build`: 브라우저 라이브러리와 Worker를 로컬 번들로 만들며 CDN 스크립트를 쓰지 않는다.
+- `npm.cmd run evidence:build`: 빌드된 Worker를 격리 workerd/D1에서 실행하고 소프트웨어 인증기의 실제 P-256 서명으로 허용·거부 요청을 재검증한다. 먼저 build가 필요하다. 운영 DB와 사용자 계정은 접근하지 않는다.
+- 공개 증거: `/verification.html`, `/verification.json`. 로그인·계정 생성 없이 열 수 있도록 배포한다. 격리 환경임을 상단과 JSON에 표시한다.
+- 브라우저의 '현재 확인 기록 JSON 내려받기': 해당 브라우저 API 기록. 쿠키·세션 토큰·개인키는 수집하지 않는다. 계정 별칭·메모 원문은 포함될 수 있으므로 공개 전 점검한다. 로그아웃·탭 숨김·계정 변경 시 화면과 기록을 비운다.
+
+## 주요 파일
+
+| 경로 | 역할 |
+|---|---|
+| `index.html` | T01 소개와 패스키 영역 원본 |
+| `src/client.js` | 기기 등록·인증 호출과 비공개 UI |
+| `src/worker.js` | 서버 질문·검증·세션·소유권·키 삭제 |
+| `src/entry.js` | Worker 진입점 |
+| `schema.sql` | 사용자·공개키·세션 해시·질문·메모 구조 |
+| `wrangler.jsonc` | T08 전용 Worker·DB·주소 설정 |
+| `docs/auth.md` | 인증 설명 여섯 항목 |
+| `docs/acceptance.md` | 원본 기준별 구현·자동 검증·남은 직접 확인 |
+| `test/` | 서버·UI 시험 |
+| `test-support/` | 격리 SQLite·소프트웨어 인증기·workerd 어댑터 |
+
+생성물 `dist/worker.js`, `public/app.js`, `public/index.html`은 Git에서 제외한다. `npm run build`로 재생성한다. 공개 검증 JSON·HTML은 재현 가능한 시험 결과로 저장한다. 검증 페이지를 제출한다고 해서 아직 하지 않은 실기기 시험이 완료되는 것은 아니다.

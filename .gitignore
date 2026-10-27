@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+.env
+.env.*
+.private/
+public/app.js
+public/index.html
+*.log
