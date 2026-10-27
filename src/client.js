@@ -128,10 +128,11 @@ export function mount({ doc = document, fetcher = fetch, register = startRegistr
   $('add-key-form').addEventListener('submit', e => { e.preventDefault(); const form = e.currentTarget; perform(() => registration(form, 'add'), 'add-key-status'); });
   async function loginWithKey(key = null) {
     if (!supported()) throw new Error('패스키를 지원하는 브라우저에서 HTTPS 주소로 접속하세요.');
+    const username = key ? '' : $('login-username').value.trim();
     if (key && currentUser) restoreOnVisible = true;
-    clearPrivate(); status(key ? `선택한 패스키 '${key.name}'로 로그인하는지 확인합니다. 기기의 저장소 선택 화면을 확인하세요.` : '기기에서 로그인할 패스키를 선택하세요.');
+    clearPrivate(); status(key ? `선택한 패스키 '${key.name}'로 로그인하는지 확인합니다. 기기의 저장소 선택 화면을 확인하세요.` : username ? '입력한 계정에 현재 등록된 패스키로 로그인합니다. 기기의 저장소 선택 화면을 확인하세요.' : '기기에서 로그인할 패스키를 선택하세요.');
     $('status').scrollIntoView?.({ block: 'center' });
-    const pending = await api('/api/auth/login/options', 'POST', {});
+    const pending = await api('/api/auth/login/options', 'POST', username ? { username } : {});
     // 사용자 선택을 돕는 브라우저 필터이다. 서버의 서명·세션 검증을 대신하지 않는다.
     const options = key ? { ...pending.options, allowCredentials: [{ id: key.id, type: 'public-key' }] } : pending.options;
     let response;
@@ -146,9 +147,11 @@ export function mount({ doc = document, fetcher = fetch, register = startRegistr
     await refresh(); status('패스키로 로그인했습니다.'); $('current-key').scrollIntoView?.({ block: 'center' });
   }
   $('login-btn').addEventListener('click', () => perform(() => loginWithKey()));
+  $('login-username').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('login-btn').click(); } });
   $('logout-btn').addEventListener('click', () => perform(async () => {
     // 요청 실패여도 먼저 표시와 메모리를 비운다. 성공을 가장하지는 않는다.
     clearPrivate();
+    $('login-username').value = '';
     try { await api('/api/auth/logout', 'POST', {}, false); status('로그아웃했습니다. 비공개 화면과 확인 기록을 지웠습니다.'); }
     catch { status('화면은 비웠지만 서버 로그아웃 확인에 실패했습니다. 연결을 복구한 뒤 새로고침해 상태를 확인하고 다시 로그아웃하세요.'); }
   }));

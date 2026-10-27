@@ -157,3 +157,18 @@ test('key-specific login cannot claim success using another key and restores the
     assert.equal(ui.doc.getElementById('private-panel').hidden, false);
   } finally { ui?.dom.window.close(); x.close(); }
 });
+test('anonymous login can request an account by name and switch from B to the requested A without mixed data', async () => {
+  const x = await context(); let ui;
+  try {
+    const a = x.browser(), b = x.browser(), A = await signup(a, 'fixture_a'); await signup(b, 'fixture_b');
+    let options;
+    ui = await app(x, b, { authenticate: async ({ optionsJSON }) => { options = optionsJSON; return A.key.login(optionsJSON, x.env.ORIGIN); } });
+    ui.doc.getElementById('logout-btn').click(); await settled(ui.doc);
+    ui.doc.getElementById('login-username').value = 'fixture_a';
+    ui.doc.getElementById('login-username').dispatchEvent(new ui.dom.window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })); await settled(ui.doc);
+    assert.deepEqual(options.allowCredentials.map(k => k.id), [A.result.data.credential.id]);
+    assert.match(ui.doc.getElementById('account-label').textContent, /fixture_a/);
+    assert.doesNotMatch(ui.doc.getElementById('items').textContent, /fixture_b/);
+    assert.match(ui.doc.getElementById('items').textContent, /fixture_a/);
+  } finally { ui?.dom.window.close(); x.close(); }
+});

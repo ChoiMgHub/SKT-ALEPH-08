@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>과제 8 · 공개 자동 검증 기록</title><link rel="stylesheet" href="/passkey.css"></head><body><main class="passkey-wrap"><h1>과제 8 · 공개 자동 검증 기록</h1><p>로컬 격리 workerd + D1 SQLite. 배포할 동일 Worker 번들을 실행. 소프트웨어 인증기가 시험용 P-256 키로 실제 서명을 생성하고 SimpleWebAuthn이 검증함.</p><p class="notice">갤럭시 실기기·운영 배포 시험이 아닙니다. 실제 기기 두 패스키 등록과 삭제 후 로그인은 별도 확인해야 합니다.</p><p>생성: 2026-10-27T04:41:26.008Z · 42개 확인 통과</p><p>실제 계정·비밀번호·토큰·개인키·API 키 없음. Cookie와 Set-Cookie는 가림. 공개키와 서명은 폐기한 가상 시험 키의 공개 증거.</p><p><a href="/">공개 소개로</a> · <a href="/verification.json">원문 JSON</a> · <a href="https://github.com/ChoiMgHub/SKT-ALEPH-08/blob/task-08/docs/auth.md">구현 설명</a></p><h2>허용·거부 짝</h2><article><h3>로그인 없이 열기</h3><p>허용 200: A 세션으로 /api/private 조회</p><p>거부 401: 쿠키 없이 같은 API 조회</p></article><article><h3>남의 패스키 계정으로 열기 · A → B</h3><p>허용 200: 자료 소유자의 정상 조회</p><p>거부 403: A → B 조회·수정·삭제 거부, 피해자 원문과 건수 불변</p></article><article><h3>남의 패스키 계정으로 열기 · B → A</h3><p>허용 200: 자료 소유자의 정상 조회</p><p>거부 403: B → A 조회·수정·삭제 거부, 피해자 원문과 건수 불변</p></article><article><h3>이미 쓴 질문 재사용</h3><p>허용 200: 새 질문과 올바른 서명</p><p>거부 401: 동일 요청 본문 재전송</p></article><article><h3>패스키 삭제 뒤 로그인</h3><p>허용 200: 같은 계정에 남아 있는 예비 키</p><p>거부 401: 서버에서 삭제한 이전 키</p></article><h2>서버 저장 공개키 · 격리 시험 계정</h2><article><h3>자동 시험 기본 키</h3><p>2026-10-27T04:41:25.682Z · 기타·확인 필요</p><pre>pQECAyYgASFYIIaZpk3w_PHi-7FJqPGG1E_esAV0mrWQ1mS_1EJ-WpmdIlggAqUuv11FXZEQkKiOrBmWD2CpQ8vsIL1z8XjDgXzphWI</pre></article><article><h3>자동 시험 예비 키</h3><p>2026-10-27T04:41:25.922Z · 기타·확인 필요</p><pre>pQECAyYgASFYIL8124sVLSfZjy03WgXfRjx8unUQanxsv0-tlrZIO6_wIlggQkdFSOUzC5N0dkN1oFEbkgByw3NXcuMMByeB4ok3Vok</pre></article><h2>검사 결과</h2><ul><li>통과: 취소할 등록 질문 발급</li><li>통과: 등록 취소</li><li>통과: A 등록 검증 성공</li><li>통과: A 세션에 실제 등록 인증 키 표시</li><li>통과: B 등록 검증 성공</li><li>통과: 등록마다 새 질문</li><li>통과: A 가상 메모 세 개</li><li>통과: B 가상 메모 세 개</li><li>통과: 본인 로그인 조회 허용</li><li>통과: 익명 조회 거부</li><li>통과: A → B GET 거부</li><li>통과: A → B PATCH 거부</li><li>통과: A → B DELETE 거부</li><li>통과: A → B 피해자 건수·원문 불변</li><li>통과: A → B URL·헤더 위조해도 본인 자료만</li><li>통과: A → B 본문 소유자 위조 무시</li><li>통과: A → B 위조 후 피해자 원문 불변</li><li>통과: B → A GET 거부</li><li>통과: B → A PATCH 거부</li><li>통과: B → A DELETE 거부</li><li>통과: B → A 피해자 건수·원문 불변</li><li>통과: B → A URL·헤더 위조해도 본인 자료만</li><li>통과: B → A 본문 소유자 위조 무시</li><li>통과: B → A 위조 후 피해자 원문 불변</li><li>통과: 잘못된 서명 거부</li><li>통과: 올바른 서명 허용</li><li>통과: 로그인마다 새 질문</li><li>통과: 이미 사용한 질문 재전송 거부</li><li>통과: 로그아웃 성공</li><li>통과: 로그아웃 뒤 옛 쿠키 재전송 거부</li><li>통과: 기존 키 재로그인</li><li>통과: 두 번째 키 등록</li><li>통과: 같은 계정 패스키 두 개</li><li>통과: 패스키 이름·날짜·공개키 있음</li><li>통과: 첫 번째 키 삭제</li><li>통과: 삭제한 키 로그인 거부</li><li>통과: 남은 키 로그인 허용</li><li>통과: 예비 키 로그인 뒤 실제 인증 키 표시</li><li>통과: 마지막 키 삭제 차단</li><li>통과: 다른 계정 키 삭제 차단</li><li>통과: A 시험 계정 정리</li><li>통과: B 시험 계정 정리</li></ul><details><summary>요청·응답 원문 (쿠키 제외)</summary><pre>[
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>과제 8 · 공개 자동 검증 기록</title><link rel="stylesheet" href="/passkey.css"></head><body><main class="passkey-wrap"><h1>과제 8 · 공개 자동 검증 기록</h1><p>로컬 격리 workerd + D1 SQLite. 배포할 동일 Worker 번들을 실행. 소프트웨어 인증기가 시험용 P-256 키로 실제 서명을 생성하고 SimpleWebAuthn이 검증함.</p><p class="notice">갤럭시 실기기·운영 배포 시험이 아닙니다. 실제 기기 두 패스키 등록과 삭제 후 로그인은 별도 확인해야 합니다.</p><p>생성: 2026-10-27T05:16:23.752Z · 46개 확인 통과</p><p>실제 계정·비밀번호·토큰·개인키·API 키 없음. Cookie와 Set-Cookie는 가림. 공개키와 서명은 폐기한 가상 시험 키의 공개 증거.</p><p><a href="/">공개 소개로</a> · <a href="/verification.json">원문 JSON</a> · <a href="https://github.com/ChoiMgHub/SKT-ALEPH-08/blob/task-08/docs/auth.md">구현 설명</a></p><h2>허용·거부 짝</h2><article><h3>로그인 없이 열기</h3><p>허용 200: A 세션으로 /api/private 조회</p><p>거부 401: 쿠키 없이 같은 API 조회</p></article><article><h3>남의 패스키 계정으로 열기 · A → B</h3><p>허용 200: 자료 소유자의 정상 조회</p><p>거부 403: A → B 조회·수정·삭제 거부, 피해자 원문과 건수 불변</p></article><article><h3>남의 패스키 계정으로 열기 · B → A</h3><p>허용 200: 자료 소유자의 정상 조회</p><p>거부 403: B → A 조회·수정·삭제 거부, 피해자 원문과 건수 불변</p></article><article><h3>이미 쓴 질문 재사용</h3><p>허용 200: 새 질문과 올바른 서명</p><p>거부 401: 동일 요청 본문 재전송</p></article><article><h3>패스키 삭제 뒤 로그인</h3><p>허용 200: 같은 계정에 남아 있는 예비 키</p><p>거부 401: 서버에서 삭제한 이전 키</p></article><h2>서버 저장 공개키 · 격리 시험 계정</h2><article><h3>자동 시험 기본 키</h3><p>2026-10-27T05:16:23.448Z · 기타·확인 필요</p><pre>pQECAyYgASFYIG9TxvADUOrrUeIepweZBNYimaS3BTkJO77QHaGuob6pIlggk8wh4dJvT1EYF1lV6Sqfo8On0bdIRa4uu2r-gssAAvo</pre></article><article><h3>자동 시험 예비 키</h3><p>2026-10-27T05:16:23.648Z · 기타·확인 필요</p><pre>pQECAyYgASFYINVnvlW8WQpZDTseXoOme39MQ39PBvr-aO7_nht4uPh2IlggYHz5F2HCcibuH7mwGHip8gv2RAP8I0d5YhEi3SGNiyo</pre></article><h2>검사 결과</h2><ul><li>통과: 취소할 등록 질문 발급</li><li>통과: 등록 취소</li><li>통과: A 등록 검증 성공</li><li>통과: A 세션에 실제 등록 인증 키 표시</li><li>통과: B 등록 검증 성공</li><li>통과: 등록마다 새 질문</li><li>통과: A 가상 메모 세 개</li><li>통과: B 가상 메모 세 개</li><li>통과: 본인 로그인 조회 허용</li><li>통과: 익명 조회 거부</li><li>통과: A → B GET 거부</li><li>통과: A → B PATCH 거부</li><li>통과: A → B DELETE 거부</li><li>통과: A → B 피해자 건수·원문 불변</li><li>통과: A → B URL·헤더 위조해도 본인 자료만</li><li>통과: A → B 본문 소유자 위조 무시</li><li>통과: A → B 위조 후 피해자 원문 불변</li><li>통과: B → A GET 거부</li><li>통과: B → A PATCH 거부</li><li>통과: B → A DELETE 거부</li><li>통과: B → A 피해자 건수·원문 불변</li><li>통과: B → A URL·헤더 위조해도 본인 자료만</li><li>통과: B → A 본문 소유자 위조 무시</li><li>통과: B → A 위조 후 피해자 원문 불변</li><li>통과: 잘못된 서명 거부</li><li>통과: 올바른 서명 허용</li><li>통과: 로그인마다 새 질문</li><li>통과: 이미 사용한 질문 재전송 거부</li><li>통과: 로그아웃 성공</li><li>통과: 로그아웃 뒤 옛 쿠키 재전송 거부</li><li>통과: 기존 키 재로그인</li><li>통과: 두 번째 키 등록</li><li>통과: 같은 계정 패스키 두 개</li><li>통과: 패스키 이름·날짜·공개키 있음</li><li>통과: 첫 번째 키 삭제</li><li>통과: 아이디 지정 로그인은 삭제 키를 제외하고 남은 키만 요청</li><li>통과: A 지정 질문에 B의 정상 서명도 거부</li><li>통과: 아이디 지정 후 남은 예비 키로 로그인 허용</li><li>통과: 아이디 지정 로그인은 지정한 A 계정으로만 연결</li><li>통과: 삭제한 키 로그인 거부</li><li>통과: 남은 키 로그인 허용</li><li>통과: 예비 키 로그인 뒤 실제 인증 키 표시</li><li>통과: 마지막 키 삭제 차단</li><li>통과: 다른 계정 키 삭제 차단</li><li>통과: A 시험 계정 정리</li><li>통과: B 시험 계정 정리</li></ul><details><summary>요청·응답 원문 (쿠키 제외)</summary><pre>[
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;POST&quot;,
@@ -14,15 +14,15 @@
     &quot;response&quot;: {
       &quot;status&quot;: 200,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;8ef320ad-3c78-44f9-9349-c3604c185e6a&quot;,
+        &quot;ceremonyId&quot;: &quot;22ac0368-d4f1-4cae-8670-8791636c8e8e&quot;,
         &quot;options&quot;: {
-          &quot;challenge&quot;: &quot;Wv4bkHVmSLresr_8QFpS5Z05gVqLaCavFIfTIgDimxA&quot;,
+          &quot;challenge&quot;: &quot;QkgluqgB6KXR62uL0CGMPlZtD_RlE5X2Z8qx6nj_Cmc&quot;,
           &quot;rp&quot;: {
             &quot;name&quot;: &quot;SKT ALEPH 08 · 내 소개와 비공개 메모&quot;,
             &quot;id&quot;: &quot;t08.example.test&quot;
           },
           &quot;user&quot;: {
-            &quot;id&quot;: &quot;MTkzM2NmZDYtMDUyMC00NGEyLWI5ZDYtMjRlNTNjMDg4N2Jh&quot;,
+            &quot;id&quot;: &quot;YzA4OTE1MWEtZDE1OC00ZGVjLTk3MGYtN2I2MmQ0M2ZjNGYz&quot;,
             &quot;name&quot;: &quot;fixture_a&quot;,
             &quot;displayName&quot;: &quot;fixture_a&quot;
           },
@@ -58,7 +58,7 @@
       &quot;method&quot;: &quot;POST&quot;,
       &quot;path&quot;: &quot;/api/auth/cancel&quot;,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;8ef320ad-3c78-44f9-9349-c3604c185e6a&quot;
+        &quot;ceremonyId&quot;: &quot;22ac0368-d4f1-4cae-8670-8791636c8e8e&quot;
       },
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -86,15 +86,15 @@
     &quot;response&quot;: {
       &quot;status&quot;: 200,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;8187a505-dbb6-465d-be19-6a858c2403ca&quot;,
+        &quot;ceremonyId&quot;: &quot;f4eadf87-7e11-4d06-9a6d-c436c28e6407&quot;,
         &quot;options&quot;: {
-          &quot;challenge&quot;: &quot;L0zQ61gDgjadQytWLScNUjzzdf3Gfxk6AEO-uWrnmzk&quot;,
+          &quot;challenge&quot;: &quot;A0TEmzZ_Mr7nAtOnb78V6bfgE_vnzyvjn_6zI1MsRZc&quot;,
           &quot;rp&quot;: {
             &quot;name&quot;: &quot;SKT ALEPH 08 · 내 소개와 비공개 메모&quot;,
             &quot;id&quot;: &quot;t08.example.test&quot;
           },
           &quot;user&quot;: {
-            &quot;id&quot;: &quot;NzlmZGFjMDItNGE1Yi00NjBlLWEzYzQtM2FmNjcwMDc5OTQz&quot;,
+            &quot;id&quot;: &quot;MzMzNzBjOGMtZWRjNy00ZGEyLTgwMzctZWM5NWU5OTliZmQy&quot;,
             &quot;name&quot;: &quot;fixture_a&quot;,
             &quot;displayName&quot;: &quot;fixture_a&quot;
           },
@@ -131,16 +131,16 @@
       &quot;path&quot;: &quot;/api/auth/registration/verify&quot;,
       &quot;body&quot;: {
         &quot;mode&quot;: &quot;signup&quot;,
-        &quot;ceremonyId&quot;: &quot;8187a505-dbb6-465d-be19-6a858c2403ca&quot;,
+        &quot;ceremonyId&quot;: &quot;f4eadf87-7e11-4d06-9a6d-c436c28e6407&quot;,
         &quot;response&quot;: {
-          &quot;id&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
-          &quot;rawId&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
+          &quot;id&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
+          &quot;rawId&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
           &quot;type&quot;: &quot;public-key&quot;,
           &quot;authenticatorAttachment&quot;: &quot;platform&quot;,
           &quot;clientExtensionResults&quot;: {},
           &quot;response&quot;: {
-            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiTDB6UTYxZ0RnamFkUXl0V0xTY05Vanp6ZGYzR2Z4azZBRU8tdVdybm16ayIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
-            &quot;attestationObject&quot;: &quot;o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikjM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs1FAAAAAAAAAAAAAAAAAAAAAAAAAAAAIMTfRRy4s0ZQlV-IvHfdr2Etu8tUN-wJGKafjs3czRSipQECAyYgASFYIIaZpk3w_PHi-7FJqPGG1E_esAV0mrWQ1mS_1EJ-WpmdIlggAqUuv11FXZEQkKiOrBmWD2CpQ8vsIL1z8XjDgXzphWI&quot;,
+            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQTBURW16Wl9NcjduQXRPbmI3OFY2YmZnRV92bnp5dmpuXzZ6STFNc1JaYyIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
+            &quot;attestationObject&quot;: &quot;o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikjM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs1FAAAAAAAAAAAAAAAAAAAAAAAAAAAAIIkHgMHZqaaNpn1oDlQo8Umu4-k-PbUAPti36uV5ZrWRpQECAyYgASFYIG9TxvADUOrrUeIepweZBNYimaS3BTkJO77QHaGuob6pIlggk8wh4dJvT1EYF1lV6Sqfo8On0bdIRa4uu2r-gssAAvo&quot;,
             &quot;transports&quot;: [
               &quot;internal&quot;
             ]
@@ -154,13 +154,13 @@
       &quot;body&quot;: {
         &quot;verified&quot;: true,
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;username&quot;: &quot;fixture_a&quot;
         },
         &quot;credential&quot;: {
-          &quot;id&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
+          &quot;id&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
           &quot;name&quot;: &quot;자동 시험 기본 키&quot;,
-          &quot;publicKey&quot;: &quot;pQECAyYgASFYIIaZpk3w_PHi-7FJqPGG1E_esAV0mrWQ1mS_1EJ-WpmdIlggAqUuv11FXZEQkKiOrBmWD2CpQ8vsIL1z8XjDgXzphWI&quot;
+          &quot;publicKey&quot;: &quot;pQECAyYgASFYIG9TxvADUOrrUeIepweZBNYimaS3BTkJO77QHaGuob6pIlggk8wh4dJvT1EYF1lV6Sqfo8On0bdIRa4uu2r-gssAAvo&quot;
         }
       },
       &quot;setCookie&quot;: &quot;[REDACTED]&quot;
@@ -177,14 +177,14 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;username&quot;: &quot;fixture_a&quot;
         },
         &quot;credential&quot;: {
-          &quot;id&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
+          &quot;id&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
           &quot;name&quot;: &quot;자동 시험 기본 키&quot;
         },
-        &quot;expiresAt&quot;: &quot;2026-10-27T05:41:25.682Z&quot;
+        &quot;expiresAt&quot;: &quot;2026-10-27T06:16:23.448Z&quot;
       },
       &quot;setCookie&quot;: null
     }
@@ -204,15 +204,15 @@
     &quot;response&quot;: {
       &quot;status&quot;: 200,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;8aa89444-81be-4abe-a29d-6d043cefdc03&quot;,
+        &quot;ceremonyId&quot;: &quot;1d15e6ca-dd28-4568-a05e-39f5287d497b&quot;,
         &quot;options&quot;: {
-          &quot;challenge&quot;: &quot;G5Xx1U5sjHt0gybqkdoCowQgvCweJx7npiu5M2T_ITQ&quot;,
+          &quot;challenge&quot;: &quot;WOswLtmmc3Q4nUuvqPUG3h8ozEW5dWbKQLDI9rbKJTE&quot;,
           &quot;rp&quot;: {
             &quot;name&quot;: &quot;SKT ALEPH 08 · 내 소개와 비공개 메모&quot;,
             &quot;id&quot;: &quot;t08.example.test&quot;
           },
           &quot;user&quot;: {
-            &quot;id&quot;: &quot;MGU4YzVjOGEtZDMyZC00NGM1LTg5NDgtMWJmZWJmZmU1YmQz&quot;,
+            &quot;id&quot;: &quot;NjM0NDVmNDUtYjM5Ny00Mjc2LTljM2MtMDMyZTdiOTEwYWM1&quot;,
             &quot;name&quot;: &quot;fixture_b&quot;,
             &quot;displayName&quot;: &quot;fixture_b&quot;
           },
@@ -249,16 +249,16 @@
       &quot;path&quot;: &quot;/api/auth/registration/verify&quot;,
       &quot;body&quot;: {
         &quot;mode&quot;: &quot;signup&quot;,
-        &quot;ceremonyId&quot;: &quot;8aa89444-81be-4abe-a29d-6d043cefdc03&quot;,
+        &quot;ceremonyId&quot;: &quot;1d15e6ca-dd28-4568-a05e-39f5287d497b&quot;,
         &quot;response&quot;: {
-          &quot;id&quot;: &quot;VUSkPh-6U_FVFktTonN8Wrp3w0poyXrSInDHkGC-iws&quot;,
-          &quot;rawId&quot;: &quot;VUSkPh-6U_FVFktTonN8Wrp3w0poyXrSInDHkGC-iws&quot;,
+          &quot;id&quot;: &quot;mn_erEvFNJbncKaivlZL27bjaP4CZXFFUfgdSADAOvA&quot;,
+          &quot;rawId&quot;: &quot;mn_erEvFNJbncKaivlZL27bjaP4CZXFFUfgdSADAOvA&quot;,
           &quot;type&quot;: &quot;public-key&quot;,
           &quot;authenticatorAttachment&quot;: &quot;platform&quot;,
           &quot;clientExtensionResults&quot;: {},
           &quot;response&quot;: {
-            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiRzVYeDFVNXNqSHQwZ3licWtkb0Nvd1FndkN3ZUp4N25waXU1TTJUX0lUUSIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
-            &quot;attestationObject&quot;: &quot;o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikjM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs1FAAAAAAAAAAAAAAAAAAAAAAAAAAAAIFVEpD4fulPxVRZLU6JzfFq6d8NKaMl60iJwx5BgvosLpQECAyYgASFYIMk5wx6uahQHtr7X1lAPQxMbhslsl_u33EIqCWoikl1BIlggdAHs98B0SNlkDzTt7OrnCKAV9PeeaFLn6MInEsZlUH0&quot;,
+            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiV09zd0x0bW1jM1E0blV1dnFQVUczaDhvekVXNWRXYktRTERJOXJiS0pURSIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
+            &quot;attestationObject&quot;: &quot;o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikjM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs1FAAAAAAAAAAAAAAAAAAAAAAAAAAAAIJp_3qxLxTSW53Cmor5WS9u242j-AmVxRVH4HUgAwDrwpQECAyYgASFYIGFstvxNws-aRHewGAEaOw5jU0UU_di_F_KXRRGOEV-_IlggZgDuFwqWgKcPuoVq89sLLQ51xs4yONWfbZgC_h4U7VM&quot;,
             &quot;transports&quot;: [
               &quot;internal&quot;
             ]
@@ -272,13 +272,13 @@
       &quot;body&quot;: {
         &quot;verified&quot;: true,
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+          &quot;id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
           &quot;username&quot;: &quot;fixture_b&quot;
         },
         &quot;credential&quot;: {
-          &quot;id&quot;: &quot;VUSkPh-6U_FVFktTonN8Wrp3w0poyXrSInDHkGC-iws&quot;,
+          &quot;id&quot;: &quot;mn_erEvFNJbncKaivlZL27bjaP4CZXFFUfgdSADAOvA&quot;,
           &quot;name&quot;: &quot;자동 시험 기본 키&quot;,
-          &quot;publicKey&quot;: &quot;pQECAyYgASFYIMk5wx6uahQHtr7X1lAPQxMbhslsl_u33EIqCWoikl1BIlggdAHs98B0SNlkDzTt7OrnCKAV9PeeaFLn6MInEsZlUH0&quot;
+          &quot;publicKey&quot;: &quot;pQECAyYgASFYIGFstvxNws-aRHewGAEaOw5jU0UU_di_F_KXRRGOEV-_IlggZgDuFwqWgKcPuoVq89sLLQ51xs4yONWfbZgC_h4U7VM&quot;
         }
       },
       &quot;setCookie&quot;: &quot;[REDACTED]&quot;
@@ -295,30 +295,30 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;username&quot;: &quot;fixture_a&quot;
         },
         &quot;items&quot;: [
           {
-            &quot;id&quot;: &quot;47b41bb7-a351-40a3-b4af-de890fc0ac3d&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;97a74103-5e6f-4ef6-83e3-de0d172bb496&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 지원 목록&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 예시 기업 A·B의 공개 채용 안내를 비교할 계획입니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           },
           {
-            &quot;id&quot;: &quot;061b66ba-c3be-4319-8f34-17f1016c6027&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;25cddf44-4241-4f7e-b501-4f82219ff3d5&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 프로젝트 메모&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 가상 서버 점검 도구의 화면 구성을 정리합니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           },
           {
-            &quot;id&quot;: &quot;6b6d4c01-2fa1-4f96-b70e-6e4b52188e42&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;a4ff891d-8475-4274-af3c-3b38dedf3554&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 학습 회고&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 패스키의 공개키와 개인키 역할을 다시 설명해 봅니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           }
         ]
       },
@@ -336,30 +336,30 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+          &quot;id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
           &quot;username&quot;: &quot;fixture_b&quot;
         },
         &quot;items&quot;: [
           {
-            &quot;id&quot;: &quot;d609b132-9da1-4796-9bdd-91e31e85894a&quot;,
-            &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+            &quot;id&quot;: &quot;51b93364-538a-4fc5-890c-68ada5831371&quot;,
+            &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
             &quot;title&quot;: &quot;가상 지원 목록&quot;,
             &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 예시 기업 A·B의 공개 채용 안내를 비교할 계획입니다.&quot;,
-            &quot;updated_at&quot;: 1793076085710
+            &quot;updated_at&quot;: 1793078183475
           },
           {
-            &quot;id&quot;: &quot;ce010b32-17d3-4859-81c1-c925a1f5e6eb&quot;,
-            &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+            &quot;id&quot;: &quot;f40dad89-d3bc-4aa1-badb-4115f0549a5a&quot;,
+            &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
             &quot;title&quot;: &quot;가상 프로젝트 메모&quot;,
             &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 가상 서버 점검 도구의 화면 구성을 정리합니다.&quot;,
-            &quot;updated_at&quot;: 1793076085710
+            &quot;updated_at&quot;: 1793078183475
           },
           {
-            &quot;id&quot;: &quot;bd0ee986-f7b8-47d0-9bbe-89ed533cfd1b&quot;,
-            &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+            &quot;id&quot;: &quot;a09bd4b3-fb12-4ba4-b30f-110aa604d40d&quot;,
+            &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
             &quot;title&quot;: &quot;가상 학습 회고&quot;,
             &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 패스키의 공개키와 개인키 역할을 다시 설명해 봅니다.&quot;,
-            &quot;updated_at&quot;: 1793076085710
+            &quot;updated_at&quot;: 1793078183475
           }
         ]
       },
@@ -377,30 +377,30 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;username&quot;: &quot;fixture_a&quot;
         },
         &quot;items&quot;: [
           {
-            &quot;id&quot;: &quot;47b41bb7-a351-40a3-b4af-de890fc0ac3d&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;97a74103-5e6f-4ef6-83e3-de0d172bb496&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 지원 목록&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 예시 기업 A·B의 공개 채용 안내를 비교할 계획입니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           },
           {
-            &quot;id&quot;: &quot;061b66ba-c3be-4319-8f34-17f1016c6027&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;25cddf44-4241-4f7e-b501-4f82219ff3d5&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 프로젝트 메모&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 가상 서버 점검 도구의 화면 구성을 정리합니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           },
           {
-            &quot;id&quot;: &quot;6b6d4c01-2fa1-4f96-b70e-6e4b52188e42&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;a4ff891d-8475-4274-af3c-3b38dedf3554&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 학습 회고&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 패스키의 공개키와 개인키 역할을 다시 설명해 봅니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           }
         ]
       },
@@ -425,7 +425,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;GET&quot;,
-      &quot;path&quot;: &quot;/api/private/d609b132-9da1-4796-9bdd-91e31e85894a&quot;,
+      &quot;path&quot;: &quot;/api/private/51b93364-538a-4fc5-890c-68ada5831371&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -433,11 +433,11 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;item&quot;: {
-          &quot;id&quot;: &quot;d609b132-9da1-4796-9bdd-91e31e85894a&quot;,
-          &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+          &quot;id&quot;: &quot;51b93364-538a-4fc5-890c-68ada5831371&quot;,
+          &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
           &quot;title&quot;: &quot;가상 지원 목록&quot;,
           &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 예시 기업 A·B의 공개 채용 안내를 비교할 계획입니다.&quot;,
-          &quot;updated_at&quot;: 1793076085710
+          &quot;updated_at&quot;: 1793078183475
         }
       },
       &quot;setCookie&quot;: null
@@ -446,7 +446,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;GET&quot;,
-      &quot;path&quot;: &quot;/api/private/d609b132-9da1-4796-9bdd-91e31e85894a&quot;,
+      &quot;path&quot;: &quot;/api/private/51b93364-538a-4fc5-890c-68ada5831371&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -461,7 +461,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;PATCH&quot;,
-      &quot;path&quot;: &quot;/api/private/d609b132-9da1-4796-9bdd-91e31e85894a&quot;,
+      &quot;path&quot;: &quot;/api/private/51b93364-538a-4fc5-890c-68ada5831371&quot;,
       &quot;body&quot;: {
         &quot;title&quot;: &quot;거부되어야 할 변경&quot;,
         &quot;body&quot;: &quot;가상 공격 자료&quot;
@@ -479,7 +479,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;DELETE&quot;,
-      &quot;path&quot;: &quot;/api/private/d609b132-9da1-4796-9bdd-91e31e85894a&quot;,
+      &quot;path&quot;: &quot;/api/private/51b93364-538a-4fc5-890c-68ada5831371&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -502,30 +502,30 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+          &quot;id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
           &quot;username&quot;: &quot;fixture_b&quot;
         },
         &quot;items&quot;: [
           {
-            &quot;id&quot;: &quot;d609b132-9da1-4796-9bdd-91e31e85894a&quot;,
-            &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+            &quot;id&quot;: &quot;51b93364-538a-4fc5-890c-68ada5831371&quot;,
+            &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
             &quot;title&quot;: &quot;가상 지원 목록&quot;,
             &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 예시 기업 A·B의 공개 채용 안내를 비교할 계획입니다.&quot;,
-            &quot;updated_at&quot;: 1793076085710
+            &quot;updated_at&quot;: 1793078183475
           },
           {
-            &quot;id&quot;: &quot;ce010b32-17d3-4859-81c1-c925a1f5e6eb&quot;,
-            &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+            &quot;id&quot;: &quot;f40dad89-d3bc-4aa1-badb-4115f0549a5a&quot;,
+            &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
             &quot;title&quot;: &quot;가상 프로젝트 메모&quot;,
             &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 가상 서버 점검 도구의 화면 구성을 정리합니다.&quot;,
-            &quot;updated_at&quot;: 1793076085710
+            &quot;updated_at&quot;: 1793078183475
           },
           {
-            &quot;id&quot;: &quot;bd0ee986-f7b8-47d0-9bbe-89ed533cfd1b&quot;,
-            &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+            &quot;id&quot;: &quot;a09bd4b3-fb12-4ba4-b30f-110aa604d40d&quot;,
+            &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
             &quot;title&quot;: &quot;가상 학습 회고&quot;,
             &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 패스키의 공개키와 개인키 역할을 다시 설명해 봅니다.&quot;,
-            &quot;updated_at&quot;: 1793076085710
+            &quot;updated_at&quot;: 1793078183475
           }
         ]
       },
@@ -535,7 +535,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;GET&quot;,
-      &quot;path&quot;: &quot;/api/private?user_id=0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+      &quot;path&quot;: &quot;/api/private?user_id=63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -543,30 +543,30 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;username&quot;: &quot;fixture_a&quot;
         },
         &quot;items&quot;: [
           {
-            &quot;id&quot;: &quot;47b41bb7-a351-40a3-b4af-de890fc0ac3d&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;97a74103-5e6f-4ef6-83e3-de0d172bb496&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 지원 목록&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 예시 기업 A·B의 공개 채용 안내를 비교할 계획입니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           },
           {
-            &quot;id&quot;: &quot;061b66ba-c3be-4319-8f34-17f1016c6027&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;25cddf44-4241-4f7e-b501-4f82219ff3d5&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 프로젝트 메모&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 가상 서버 점검 도구의 화면 구성을 정리합니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           },
           {
-            &quot;id&quot;: &quot;6b6d4c01-2fa1-4f96-b70e-6e4b52188e42&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;a4ff891d-8475-4274-af3c-3b38dedf3554&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 학습 회고&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 패스키의 공개키와 개인키 역할을 다시 설명해 봅니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           }
         ]
       },
@@ -580,15 +580,15 @@
       &quot;body&quot;: {
         &quot;title&quot;: &quot;가상 소유자 위조 시험&quot;,
         &quot;body&quot;: &quot;입력한 소유자를 믿지 않아야 합니다.&quot;,
-        &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;
+        &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;
       },
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
     &quot;response&quot;: {
       &quot;status&quot;: 201,
       &quot;body&quot;: {
-        &quot;id&quot;: &quot;50a30240-2c31-48d7-a8b9-b9e05cde18b7&quot;,
-        &quot;owner&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;
+        &quot;id&quot;: &quot;00dccc43-05e6-4a5e-8de9-381caa92f42e&quot;,
+        &quot;owner&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;
       },
       &quot;setCookie&quot;: null
     }
@@ -596,7 +596,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;DELETE&quot;,
-      &quot;path&quot;: &quot;/api/private/50a30240-2c31-48d7-a8b9-b9e05cde18b7&quot;,
+      &quot;path&quot;: &quot;/api/private/00dccc43-05e6-4a5e-8de9-381caa92f42e&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -619,30 +619,30 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+          &quot;id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
           &quot;username&quot;: &quot;fixture_b&quot;
         },
         &quot;items&quot;: [
           {
-            &quot;id&quot;: &quot;d609b132-9da1-4796-9bdd-91e31e85894a&quot;,
-            &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+            &quot;id&quot;: &quot;51b93364-538a-4fc5-890c-68ada5831371&quot;,
+            &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
             &quot;title&quot;: &quot;가상 지원 목록&quot;,
             &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 예시 기업 A·B의 공개 채용 안내를 비교할 계획입니다.&quot;,
-            &quot;updated_at&quot;: 1793076085710
+            &quot;updated_at&quot;: 1793078183475
           },
           {
-            &quot;id&quot;: &quot;ce010b32-17d3-4859-81c1-c925a1f5e6eb&quot;,
-            &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+            &quot;id&quot;: &quot;f40dad89-d3bc-4aa1-badb-4115f0549a5a&quot;,
+            &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
             &quot;title&quot;: &quot;가상 프로젝트 메모&quot;,
             &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 가상 서버 점검 도구의 화면 구성을 정리합니다.&quot;,
-            &quot;updated_at&quot;: 1793076085710
+            &quot;updated_at&quot;: 1793078183475
           },
           {
-            &quot;id&quot;: &quot;bd0ee986-f7b8-47d0-9bbe-89ed533cfd1b&quot;,
-            &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+            &quot;id&quot;: &quot;a09bd4b3-fb12-4ba4-b30f-110aa604d40d&quot;,
+            &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
             &quot;title&quot;: &quot;가상 학습 회고&quot;,
             &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 패스키의 공개키와 개인키 역할을 다시 설명해 봅니다.&quot;,
-            &quot;updated_at&quot;: 1793076085710
+            &quot;updated_at&quot;: 1793078183475
           }
         ]
       },
@@ -652,7 +652,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;GET&quot;,
-      &quot;path&quot;: &quot;/api/private/47b41bb7-a351-40a3-b4af-de890fc0ac3d&quot;,
+      &quot;path&quot;: &quot;/api/private/97a74103-5e6f-4ef6-83e3-de0d172bb496&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -660,11 +660,11 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;item&quot;: {
-          &quot;id&quot;: &quot;47b41bb7-a351-40a3-b4af-de890fc0ac3d&quot;,
-          &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;97a74103-5e6f-4ef6-83e3-de0d172bb496&quot;,
+          &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;title&quot;: &quot;가상 지원 목록&quot;,
           &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 예시 기업 A·B의 공개 채용 안내를 비교할 계획입니다.&quot;,
-          &quot;updated_at&quot;: 1793076085682
+          &quot;updated_at&quot;: 1793078183448
         }
       },
       &quot;setCookie&quot;: null
@@ -673,7 +673,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;GET&quot;,
-      &quot;path&quot;: &quot;/api/private/47b41bb7-a351-40a3-b4af-de890fc0ac3d&quot;,
+      &quot;path&quot;: &quot;/api/private/97a74103-5e6f-4ef6-83e3-de0d172bb496&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -688,7 +688,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;PATCH&quot;,
-      &quot;path&quot;: &quot;/api/private/47b41bb7-a351-40a3-b4af-de890fc0ac3d&quot;,
+      &quot;path&quot;: &quot;/api/private/97a74103-5e6f-4ef6-83e3-de0d172bb496&quot;,
       &quot;body&quot;: {
         &quot;title&quot;: &quot;거부되어야 할 변경&quot;,
         &quot;body&quot;: &quot;가상 공격 자료&quot;
@@ -706,7 +706,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;DELETE&quot;,
-      &quot;path&quot;: &quot;/api/private/47b41bb7-a351-40a3-b4af-de890fc0ac3d&quot;,
+      &quot;path&quot;: &quot;/api/private/97a74103-5e6f-4ef6-83e3-de0d172bb496&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -729,30 +729,30 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;username&quot;: &quot;fixture_a&quot;
         },
         &quot;items&quot;: [
           {
-            &quot;id&quot;: &quot;47b41bb7-a351-40a3-b4af-de890fc0ac3d&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;97a74103-5e6f-4ef6-83e3-de0d172bb496&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 지원 목록&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 예시 기업 A·B의 공개 채용 안내를 비교할 계획입니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           },
           {
-            &quot;id&quot;: &quot;061b66ba-c3be-4319-8f34-17f1016c6027&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;25cddf44-4241-4f7e-b501-4f82219ff3d5&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 프로젝트 메모&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 가상 서버 점검 도구의 화면 구성을 정리합니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           },
           {
-            &quot;id&quot;: &quot;6b6d4c01-2fa1-4f96-b70e-6e4b52188e42&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;a4ff891d-8475-4274-af3c-3b38dedf3554&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 학습 회고&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 패스키의 공개키와 개인키 역할을 다시 설명해 봅니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           }
         ]
       },
@@ -762,7 +762,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;GET&quot;,
-      &quot;path&quot;: &quot;/api/private?user_id=79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+      &quot;path&quot;: &quot;/api/private?user_id=33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -770,30 +770,30 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+          &quot;id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
           &quot;username&quot;: &quot;fixture_b&quot;
         },
         &quot;items&quot;: [
           {
-            &quot;id&quot;: &quot;d609b132-9da1-4796-9bdd-91e31e85894a&quot;,
-            &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+            &quot;id&quot;: &quot;51b93364-538a-4fc5-890c-68ada5831371&quot;,
+            &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
             &quot;title&quot;: &quot;가상 지원 목록&quot;,
             &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 예시 기업 A·B의 공개 채용 안내를 비교할 계획입니다.&quot;,
-            &quot;updated_at&quot;: 1793076085710
+            &quot;updated_at&quot;: 1793078183475
           },
           {
-            &quot;id&quot;: &quot;ce010b32-17d3-4859-81c1-c925a1f5e6eb&quot;,
-            &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+            &quot;id&quot;: &quot;f40dad89-d3bc-4aa1-badb-4115f0549a5a&quot;,
+            &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
             &quot;title&quot;: &quot;가상 프로젝트 메모&quot;,
             &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 가상 서버 점검 도구의 화면 구성을 정리합니다.&quot;,
-            &quot;updated_at&quot;: 1793076085710
+            &quot;updated_at&quot;: 1793078183475
           },
           {
-            &quot;id&quot;: &quot;bd0ee986-f7b8-47d0-9bbe-89ed533cfd1b&quot;,
-            &quot;user_id&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;,
+            &quot;id&quot;: &quot;a09bd4b3-fb12-4ba4-b30f-110aa604d40d&quot;,
+            &quot;user_id&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;,
             &quot;title&quot;: &quot;가상 학습 회고&quot;,
             &quot;body&quot;: &quot;fixture_b의 연습 자료입니다. 패스키의 공개키와 개인키 역할을 다시 설명해 봅니다.&quot;,
-            &quot;updated_at&quot;: 1793076085710
+            &quot;updated_at&quot;: 1793078183475
           }
         ]
       },
@@ -807,15 +807,15 @@
       &quot;body&quot;: {
         &quot;title&quot;: &quot;가상 소유자 위조 시험&quot;,
         &quot;body&quot;: &quot;입력한 소유자를 믿지 않아야 합니다.&quot;,
-        &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;
+        &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;
       },
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
     &quot;response&quot;: {
       &quot;status&quot;: 201,
       &quot;body&quot;: {
-        &quot;id&quot;: &quot;1d44601d-e91a-4097-a134-4be7871c04e1&quot;,
-        &quot;owner&quot;: &quot;0e8c5c8a-d32d-44c5-8948-1bfebffe5bd3&quot;
+        &quot;id&quot;: &quot;d3724b1e-0b14-46ec-9845-5a98dc4db839&quot;,
+        &quot;owner&quot;: &quot;63445f45-b397-4276-9c3c-032e7b910ac5&quot;
       },
       &quot;setCookie&quot;: null
     }
@@ -823,7 +823,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;DELETE&quot;,
-      &quot;path&quot;: &quot;/api/private/1d44601d-e91a-4097-a134-4be7871c04e1&quot;,
+      &quot;path&quot;: &quot;/api/private/d3724b1e-0b14-46ec-9845-5a98dc4db839&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -846,30 +846,30 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;username&quot;: &quot;fixture_a&quot;
         },
         &quot;items&quot;: [
           {
-            &quot;id&quot;: &quot;47b41bb7-a351-40a3-b4af-de890fc0ac3d&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;97a74103-5e6f-4ef6-83e3-de0d172bb496&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 지원 목록&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 예시 기업 A·B의 공개 채용 안내를 비교할 계획입니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           },
           {
-            &quot;id&quot;: &quot;061b66ba-c3be-4319-8f34-17f1016c6027&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;25cddf44-4241-4f7e-b501-4f82219ff3d5&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 프로젝트 메모&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 가상 서버 점검 도구의 화면 구성을 정리합니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           },
           {
-            &quot;id&quot;: &quot;6b6d4c01-2fa1-4f96-b70e-6e4b52188e42&quot;,
-            &quot;user_id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+            &quot;id&quot;: &quot;a4ff891d-8475-4274-af3c-3b38dedf3554&quot;,
+            &quot;user_id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
             &quot;title&quot;: &quot;가상 학습 회고&quot;,
             &quot;body&quot;: &quot;fixture_a의 연습 자료입니다. 패스키의 공개키와 개인키 역할을 다시 설명해 봅니다.&quot;,
-            &quot;updated_at&quot;: 1793076085682
+            &quot;updated_at&quot;: 1793078183448
           }
         ]
       },
@@ -886,10 +886,10 @@
     &quot;response&quot;: {
       &quot;status&quot;: 200,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;2577997d-b4ae-4c98-9ea7-758f0677dd19&quot;,
+        &quot;ceremonyId&quot;: &quot;46ae110d-bc15-4855-b384-9bd0b916c142&quot;,
         &quot;options&quot;: {
           &quot;rpId&quot;: &quot;t08.example.test&quot;,
-          &quot;challenge&quot;: &quot;pgChMSsnE59gRI3SAc4d_1X0aQ58sIx_xFH2XYCVM5Q&quot;,
+          &quot;challenge&quot;: &quot;EWo-Ft3f6uMeD1E5wqXcY8lj7ON63_IFs-k1vKDigUQ&quot;,
           &quot;timeout&quot;: 300000,
           &quot;userVerification&quot;: &quot;required&quot;
         }
@@ -902,18 +902,18 @@
       &quot;method&quot;: &quot;POST&quot;,
       &quot;path&quot;: &quot;/api/auth/login/verify&quot;,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;2577997d-b4ae-4c98-9ea7-758f0677dd19&quot;,
+        &quot;ceremonyId&quot;: &quot;46ae110d-bc15-4855-b384-9bd0b916c142&quot;,
         &quot;response&quot;: {
-          &quot;id&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
-          &quot;rawId&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
+          &quot;id&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
+          &quot;rawId&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
           &quot;type&quot;: &quot;public-key&quot;,
           &quot;authenticatorAttachment&quot;: &quot;platform&quot;,
           &quot;clientExtensionResults&quot;: {},
           &quot;response&quot;: {
-            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoicGdDaE1Tc25FNTlnUkkzU0FjNGRfMVgwYVE1OHNJeF94RkgyWFlDVk01USIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
+            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiRVdvLUZ0M2Y2dU1lRDFFNXdxWGNZOGxqN09ONjNfSUZzLWsxdktEaWdVUSIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
             &quot;authenticatorData&quot;: &quot;jM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs0FAAAAAQ&quot;,
-            &quot;signature&quot;: &quot;MEQCIFoxQt_LbKceQQ2A1uSpRQVP6SyJfZmvJy_E8FGII4UgAiB6oph0dy87f0IMBcUlR-O_cyBCrSMHLaQFWHZC__LxUQ&quot;,
-            &quot;userHandle&quot;: &quot;NzlmZGFjMDItNGE1Yi00NjBlLWEzYzQtM2FmNjcwMDc5OTQz&quot;
+            &quot;signature&quot;: &quot;MEYCIQCIgjeWEe_d95IesL9k4V_aYesEIVqjJ1oyQxOFI5vaMQIhAMFzWzreOR3BY_eJtZEeP7r4wKHIG_b-IXPUYhd-jHon&quot;,
+            &quot;userHandle&quot;: &quot;MzMzNzBjOGMtZWRjNy00ZGEyLTgwMzctZWM5NWU5OTliZmQy&quot;
           }
         }
       },
@@ -937,10 +937,10 @@
     &quot;response&quot;: {
       &quot;status&quot;: 200,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;98658447-5f70-4b65-a191-727df9cc6845&quot;,
+        &quot;ceremonyId&quot;: &quot;b75f2c42-64b6-422d-bcef-62c93f1c8202&quot;,
         &quot;options&quot;: {
           &quot;rpId&quot;: &quot;t08.example.test&quot;,
-          &quot;challenge&quot;: &quot;M4cmIJJScv7h2DPbA7BM1map0-DHWqChmWCwnqLExKg&quot;,
+          &quot;challenge&quot;: &quot;OYojz7z7gwcKAcegjT7ElqDJ2Rv8onZiQUMQ5b5ePPA&quot;,
           &quot;timeout&quot;: 300000,
           &quot;userVerification&quot;: &quot;required&quot;
         }
@@ -953,18 +953,18 @@
       &quot;method&quot;: &quot;POST&quot;,
       &quot;path&quot;: &quot;/api/auth/login/verify&quot;,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;98658447-5f70-4b65-a191-727df9cc6845&quot;,
+        &quot;ceremonyId&quot;: &quot;b75f2c42-64b6-422d-bcef-62c93f1c8202&quot;,
         &quot;response&quot;: {
-          &quot;id&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
-          &quot;rawId&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
+          &quot;id&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
+          &quot;rawId&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
           &quot;type&quot;: &quot;public-key&quot;,
           &quot;authenticatorAttachment&quot;: &quot;platform&quot;,
           &quot;clientExtensionResults&quot;: {},
           &quot;response&quot;: {
-            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiTTRjbUlKSlNjdjdoMkRQYkE3Qk0xbWFwMC1ESFdxQ2htV0N3bnFMRXhLZyIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
+            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiT1lvano3ejdnd2NLQWNlZ2pUN0VscURKMlJ2OG9uWmlRVU1RNWI1ZVBQQSIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
             &quot;authenticatorData&quot;: &quot;jM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs0FAAAAAg&quot;,
-            &quot;signature&quot;: &quot;MEYCIQDrZnWA_SyCqtfdVFjwtM3UT38P49pWNXdkzzJaL2B__AIhAO3GRGPBYKxNIZASwuDyWKVU70MDJR_Owu6yL1FcN_5G&quot;,
-            &quot;userHandle&quot;: &quot;NzlmZGFjMDItNGE1Yi00NjBlLWEzYzQtM2FmNjcwMDc5OTQz&quot;
+            &quot;signature&quot;: &quot;MEUCIQCvL3FKBshoWbypV9jX5sKydYRNY06zBwzBtKEYvUFX6QIgQ0PP9bNIKzRlWZBHoFl8ToJ9LqVHaBI1G4gR-s7puWs&quot;,
+            &quot;userHandle&quot;: &quot;MzMzNzBjOGMtZWRjNy00ZGEyLTgwMzctZWM5NWU5OTliZmQy&quot;
           }
         }
       },
@@ -975,7 +975,7 @@
       &quot;body&quot;: {
         &quot;verified&quot;: true,
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;username&quot;: &quot;fixture_a&quot;
         }
       },
@@ -987,18 +987,18 @@
       &quot;method&quot;: &quot;POST&quot;,
       &quot;path&quot;: &quot;/api/auth/login/verify&quot;,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;98658447-5f70-4b65-a191-727df9cc6845&quot;,
+        &quot;ceremonyId&quot;: &quot;b75f2c42-64b6-422d-bcef-62c93f1c8202&quot;,
         &quot;response&quot;: {
-          &quot;id&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
-          &quot;rawId&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
+          &quot;id&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
+          &quot;rawId&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
           &quot;type&quot;: &quot;public-key&quot;,
           &quot;authenticatorAttachment&quot;: &quot;platform&quot;,
           &quot;clientExtensionResults&quot;: {},
           &quot;response&quot;: {
-            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiTTRjbUlKSlNjdjdoMkRQYkE3Qk0xbWFwMC1ESFdxQ2htV0N3bnFMRXhLZyIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
+            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiT1lvano3ejdnd2NLQWNlZ2pUN0VscURKMlJ2OG9uWmlRVU1RNWI1ZVBQQSIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
             &quot;authenticatorData&quot;: &quot;jM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs0FAAAAAg&quot;,
-            &quot;signature&quot;: &quot;MEYCIQDrZnWA_SyCqtfdVFjwtM3UT38P49pWNXdkzzJaL2B__AIhAO3GRGPBYKxNIZASwuDyWKVU70MDJR_Owu6yL1FcN_5G&quot;,
-            &quot;userHandle&quot;: &quot;NzlmZGFjMDItNGE1Yi00NjBlLWEzYzQtM2FmNjcwMDc5OTQz&quot;
+            &quot;signature&quot;: &quot;MEUCIQCvL3FKBshoWbypV9jX5sKydYRNY06zBwzBtKEYvUFX6QIgQ0PP9bNIKzRlWZBHoFl8ToJ9LqVHaBI1G4gR-s7puWs&quot;,
+            &quot;userHandle&quot;: &quot;MzMzNzBjOGMtZWRjNy00ZGEyLTgwMzctZWM5NWU5OTliZmQy&quot;
           }
         }
       },
@@ -1052,10 +1052,10 @@
     &quot;response&quot;: {
       &quot;status&quot;: 200,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;eb453a3b-6488-4e06-b5a3-867a3d90f1fd&quot;,
+        &quot;ceremonyId&quot;: &quot;f1f5faa9-8df6-4c85-a0fc-67004dec5ae0&quot;,
         &quot;options&quot;: {
           &quot;rpId&quot;: &quot;t08.example.test&quot;,
-          &quot;challenge&quot;: &quot;_b9vf3L9UKMk617Bv3k10l4uWBMP2qYPurQtyCCvdUY&quot;,
+          &quot;challenge&quot;: &quot;CXvvJi2_hI6Ox0EdE40LdjQpBJiKaAYi3RKjC18MvUE&quot;,
           &quot;timeout&quot;: 300000,
           &quot;userVerification&quot;: &quot;required&quot;
         }
@@ -1068,18 +1068,18 @@
       &quot;method&quot;: &quot;POST&quot;,
       &quot;path&quot;: &quot;/api/auth/login/verify&quot;,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;eb453a3b-6488-4e06-b5a3-867a3d90f1fd&quot;,
+        &quot;ceremonyId&quot;: &quot;f1f5faa9-8df6-4c85-a0fc-67004dec5ae0&quot;,
         &quot;response&quot;: {
-          &quot;id&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
-          &quot;rawId&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
+          &quot;id&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
+          &quot;rawId&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
           &quot;type&quot;: &quot;public-key&quot;,
           &quot;authenticatorAttachment&quot;: &quot;platform&quot;,
           &quot;clientExtensionResults&quot;: {},
           &quot;response&quot;: {
-            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiX2I5dmYzTDlVS01rNjE3QnYzazEwbDR1V0JNUDJxWVB1clF0eUNDdmRVWSIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
+            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQ1h2dkppMl9oSTZPeDBFZEU0MExkalFwQkppS2FBWWkzUktqQzE4TXZVRSIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
             &quot;authenticatorData&quot;: &quot;jM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs0FAAAAAw&quot;,
-            &quot;signature&quot;: &quot;MEUCIQCesB3IU8XTC3F837_qfh2-MnRohWixaXRKmFhVAuun7wIgbGHM8TO9KkbLlGgLgQe5MLT_F2LBSeq4ZRDhYXq8YeA&quot;,
-            &quot;userHandle&quot;: &quot;NzlmZGFjMDItNGE1Yi00NjBlLWEzYzQtM2FmNjcwMDc5OTQz&quot;
+            &quot;signature&quot;: &quot;MEYCIQCKJaw0tJUvd1xnCh86IU3HJ4jX8-6_kekMf3J9xzWJbQIhAIgO0RawhVdFh0P4Bqjm2AwZ4oBnuKUU6GCy5axg0-zA&quot;,
+            &quot;userHandle&quot;: &quot;MzMzNzBjOGMtZWRjNy00ZGEyLTgwMzctZWM5NWU5OTliZmQy&quot;
           }
         }
       },
@@ -1090,7 +1090,7 @@
       &quot;body&quot;: {
         &quot;verified&quot;: true,
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;username&quot;: &quot;fixture_a&quot;
         }
       },
@@ -1111,15 +1111,15 @@
     &quot;response&quot;: {
       &quot;status&quot;: 200,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;07a3814c-6bb2-466d-b3a7-992f6cefa4a1&quot;,
+        &quot;ceremonyId&quot;: &quot;46e3356d-1ed6-4c22-be1e-adae394b7bdd&quot;,
         &quot;options&quot;: {
-          &quot;challenge&quot;: &quot;Ok0IC3tY3SkcisyFPSMOZp4KnhzUYdir9RAekqkCxCg&quot;,
+          &quot;challenge&quot;: &quot;BxqLTIthfTNvIAr165lW7pGplpk95oyOE_wqiNwDF5c&quot;,
           &quot;rp&quot;: {
             &quot;name&quot;: &quot;SKT ALEPH 08 · 내 소개와 비공개 메모&quot;,
             &quot;id&quot;: &quot;t08.example.test&quot;
           },
           &quot;user&quot;: {
-            &quot;id&quot;: &quot;NzlmZGFjMDItNGE1Yi00NjBlLWEzYzQtM2FmNjcwMDc5OTQz&quot;,
+            &quot;id&quot;: &quot;MzMzNzBjOGMtZWRjNy00ZGEyLTgwMzctZWM5NWU5OTliZmQy&quot;,
             &quot;name&quot;: &quot;fixture_a&quot;,
             &quot;displayName&quot;: &quot;fixture_a&quot;
           },
@@ -1137,7 +1137,7 @@
           &quot;attestation&quot;: &quot;none&quot;,
           &quot;excludeCredentials&quot;: [
             {
-              &quot;id&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
+              &quot;id&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
               &quot;transports&quot;: [
                 &quot;internal&quot;
               ],
@@ -1164,16 +1164,16 @@
       &quot;path&quot;: &quot;/api/auth/registration/verify&quot;,
       &quot;body&quot;: {
         &quot;mode&quot;: &quot;add&quot;,
-        &quot;ceremonyId&quot;: &quot;07a3814c-6bb2-466d-b3a7-992f6cefa4a1&quot;,
+        &quot;ceremonyId&quot;: &quot;46e3356d-1ed6-4c22-be1e-adae394b7bdd&quot;,
         &quot;response&quot;: {
-          &quot;id&quot;: &quot;xrjko8xNJqXVsugQLQYZrJDuk7zpkNY3hjbQgfOOJHE&quot;,
-          &quot;rawId&quot;: &quot;xrjko8xNJqXVsugQLQYZrJDuk7zpkNY3hjbQgfOOJHE&quot;,
+          &quot;id&quot;: &quot;DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
+          &quot;rawId&quot;: &quot;DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
           &quot;type&quot;: &quot;public-key&quot;,
           &quot;authenticatorAttachment&quot;: &quot;platform&quot;,
           &quot;clientExtensionResults&quot;: {},
           &quot;response&quot;: {
-            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiT2swSUMzdFkzU2tjaXN5RlBTTU9acDRLbmh6VVlkaXI5UkFla3FrQ3hDZyIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
-            &quot;attestationObject&quot;: &quot;o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikjM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs1FAAAAAAAAAAAAAAAAAAAAAAAAAAAAIMa45KPMTSal1bLoEC0GGayQ7pO86ZDWN4Y20IHzjiRxpQECAyYgASFYIL8124sVLSfZjy03WgXfRjx8unUQanxsv0-tlrZIO6_wIlggQkdFSOUzC5N0dkN1oFEbkgByw3NXcuMMByeB4ok3Vok&quot;,
+            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQnhxTFRJdGhmVE52SUFyMTY1bFc3cEdwbHBrOTVveU9FX3dxaU53REY1YyIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
+            &quot;attestationObject&quot;: &quot;o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikjM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs1FAAAAAAAAAAAAAAAAAAAAAAAAAAAAIA4E38iTEkQ6eTXRZBNi2ixm-LC2_WjXEYUX7o1GOUpdpQECAyYgASFYINVnvlW8WQpZDTseXoOme39MQ39PBvr-aO7_nht4uPh2IlggYHz5F2HCcibuH7mwGHip8gv2RAP8I0d5YhEi3SGNiyo&quot;,
             &quot;transports&quot;: [
               &quot;internal&quot;
             ]
@@ -1187,13 +1187,13 @@
       &quot;body&quot;: {
         &quot;verified&quot;: true,
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;username&quot;: &quot;fixture_a&quot;
         },
         &quot;credential&quot;: {
-          &quot;id&quot;: &quot;xrjko8xNJqXVsugQLQYZrJDuk7zpkNY3hjbQgfOOJHE&quot;,
+          &quot;id&quot;: &quot;DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
           &quot;name&quot;: &quot;자동 시험 예비 키&quot;,
-          &quot;publicKey&quot;: &quot;pQECAyYgASFYIL8124sVLSfZjy03WgXfRjx8unUQanxsv0-tlrZIO6_wIlggQkdFSOUzC5N0dkN1oFEbkgByw3NXcuMMByeB4ok3Vok&quot;
+          &quot;publicKey&quot;: &quot;pQECAyYgASFYINVnvlW8WQpZDTseXoOme39MQ39PBvr-aO7_nht4uPh2IlggYHz5F2HCcibuH7mwGHip8gv2RAP8I0d5YhEi3SGNiyo&quot;
         }
       },
       &quot;setCookie&quot;: null
@@ -1211,25 +1211,25 @@
       &quot;body&quot;: {
         &quot;credentials&quot;: [
           {
-            &quot;id&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
+            &quot;id&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
             &quot;name&quot;: &quot;자동 시험 기본 키&quot;,
             &quot;provider&quot;: &quot;기타·확인 필요&quot;,
             &quot;providerSource&quot;: &quot;사용자가 저장 화면을 보고 직접 선택한 값&quot;,
-            &quot;registeredAt&quot;: &quot;2026-10-27T04:41:25.682Z&quot;,
-            &quot;lastUsedAt&quot;: &quot;2026-10-27T04:41:25.900Z&quot;,
-            &quot;publicKey&quot;: &quot;pQECAyYgASFYIIaZpk3w_PHi-7FJqPGG1E_esAV0mrWQ1mS_1EJ-WpmdIlggAqUuv11FXZEQkKiOrBmWD2CpQ8vsIL1z8XjDgXzphWI&quot;,
+            &quot;registeredAt&quot;: &quot;2026-10-27T05:16:23.448Z&quot;,
+            &quot;lastUsedAt&quot;: &quot;2026-10-27T05:16:23.627Z&quot;,
+            &quot;publicKey&quot;: &quot;pQECAyYgASFYIG9TxvADUOrrUeIepweZBNYimaS3BTkJO77QHaGuob6pIlggk8wh4dJvT1EYF1lV6Sqfo8On0bdIRa4uu2r-gssAAvo&quot;,
             &quot;publicKeyFormat&quot;: &quot;base64url encoded COSE public key&quot;,
             &quot;deviceType&quot;: &quot;singleDevice&quot;,
             &quot;backedUp&quot;: false
           },
           {
-            &quot;id&quot;: &quot;xrjko8xNJqXVsugQLQYZrJDuk7zpkNY3hjbQgfOOJHE&quot;,
+            &quot;id&quot;: &quot;DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
             &quot;name&quot;: &quot;자동 시험 예비 키&quot;,
             &quot;provider&quot;: &quot;기타·확인 필요&quot;,
             &quot;providerSource&quot;: &quot;사용자가 저장 화면을 보고 직접 선택한 값&quot;,
-            &quot;registeredAt&quot;: &quot;2026-10-27T04:41:25.922Z&quot;,
+            &quot;registeredAt&quot;: &quot;2026-10-27T05:16:23.648Z&quot;,
             &quot;lastUsedAt&quot;: null,
-            &quot;publicKey&quot;: &quot;pQECAyYgASFYIL8124sVLSfZjy03WgXfRjx8unUQanxsv0-tlrZIO6_wIlggQkdFSOUzC5N0dkN1oFEbkgByw3NXcuMMByeB4ok3Vok&quot;,
+            &quot;publicKey&quot;: &quot;pQECAyYgASFYINVnvlW8WQpZDTseXoOme39MQ39PBvr-aO7_nht4uPh2IlggYHz5F2HCcibuH7mwGHip8gv2RAP8I0d5YhEi3SGNiyo&quot;,
             &quot;publicKeyFormat&quot;: &quot;base64url encoded COSE public key&quot;,
             &quot;deviceType&quot;: &quot;singleDevice&quot;,
             &quot;backedUp&quot;: false
@@ -1243,7 +1243,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;DELETE&quot;,
-      &quot;path&quot;: &quot;/api/credentials/xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
+      &quot;path&quot;: &quot;/api/credentials/iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -1260,16 +1260,24 @@
     &quot;request&quot;: {
       &quot;method&quot;: &quot;POST&quot;,
       &quot;path&quot;: &quot;/api/auth/login/options&quot;,
-      &quot;body&quot;: {},
-      &quot;cookie&quot;: &quot;[REDACTED]&quot;
+      &quot;body&quot;: {
+        &quot;username&quot;: &quot;fixture_a&quot;
+      },
+      &quot;cookie&quot;: null
     },
     &quot;response&quot;: {
       &quot;status&quot;: 200,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;a62554cd-f7be-4f3f-b946-5dd256e88d50&quot;,
+        &quot;ceremonyId&quot;: &quot;3a0e2f48-151c-49a1-87c5-3ca7d4d068ee&quot;,
         &quot;options&quot;: {
           &quot;rpId&quot;: &quot;t08.example.test&quot;,
-          &quot;challenge&quot;: &quot;K0OVo3kGpp8UiKrElB2TBObvqpWwLlLuZF32Fy7xKDk&quot;,
+          &quot;challenge&quot;: &quot;kI3pd4YozfBDt2f2E3QabwvWosRYy1S69zBfIbPMElQ&quot;,
+          &quot;allowCredentials&quot;: [
+            {
+              &quot;id&quot;: &quot;DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
+              &quot;type&quot;: &quot;public-key&quot;
+            }
+          ],
           &quot;timeout&quot;: 300000,
           &quot;userVerification&quot;: &quot;required&quot;
         }
@@ -1282,18 +1290,155 @@
       &quot;method&quot;: &quot;POST&quot;,
       &quot;path&quot;: &quot;/api/auth/login/verify&quot;,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;a62554cd-f7be-4f3f-b946-5dd256e88d50&quot;,
+        &quot;ceremonyId&quot;: &quot;3a0e2f48-151c-49a1-87c5-3ca7d4d068ee&quot;,
         &quot;response&quot;: {
-          &quot;id&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
-          &quot;rawId&quot;: &quot;xN9FHLizRlCVX4i8d92vYS27y1Q37AkYpp-OzdzNFKI&quot;,
+          &quot;id&quot;: &quot;mn_erEvFNJbncKaivlZL27bjaP4CZXFFUfgdSADAOvA&quot;,
+          &quot;rawId&quot;: &quot;mn_erEvFNJbncKaivlZL27bjaP4CZXFFUfgdSADAOvA&quot;,
           &quot;type&quot;: &quot;public-key&quot;,
           &quot;authenticatorAttachment&quot;: &quot;platform&quot;,
           &quot;clientExtensionResults&quot;: {},
           &quot;response&quot;: {
-            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiSzBPVm8za0dwcDhVaUtyRWxCMlRCT2J2cXBXd0xsTHVaRjMyRnk3eEtEayIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
+            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoia0kzcGQ0WW96ZkJEdDJmMkUzUWFid3ZXb3NSWXkxUzY5ekJmSWJQTUVsUSIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
+            &quot;authenticatorData&quot;: &quot;jM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs0FAAAAAQ&quot;,
+            &quot;signature&quot;: &quot;MEYCIQDRkd_IdOPjXxrdZ4keVq3zQJps9FC5SQfBNPWnqdc3KgIhAOTcMnkiPjiCBvLGT8VyLCPpUJPz14U7j9AqFeIUtHmE&quot;,
+            &quot;userHandle&quot;: &quot;NjM0NDVmNDUtYjM5Ny00Mjc2LTljM2MtMDMyZTdiOTEwYWM1&quot;
+          }
+        }
+      },
+      &quot;cookie&quot;: &quot;[REDACTED]&quot;
+    },
+    &quot;response&quot;: {
+      &quot;status&quot;: 401,
+      &quot;body&quot;: {
+        &quot;error&quot;: &quot;패스키 로그인 확인에 실패했습니다.&quot;
+      },
+      &quot;setCookie&quot;: null
+    }
+  },
+  {
+    &quot;request&quot;: {
+      &quot;method&quot;: &quot;POST&quot;,
+      &quot;path&quot;: &quot;/api/auth/login/options&quot;,
+      &quot;body&quot;: {
+        &quot;username&quot;: &quot;fixture_a&quot;
+      },
+      &quot;cookie&quot;: &quot;[REDACTED]&quot;
+    },
+    &quot;response&quot;: {
+      &quot;status&quot;: 200,
+      &quot;body&quot;: {
+        &quot;ceremonyId&quot;: &quot;23129188-7673-4143-bcb3-9c08103e2046&quot;,
+        &quot;options&quot;: {
+          &quot;rpId&quot;: &quot;t08.example.test&quot;,
+          &quot;challenge&quot;: &quot;6Yk3lWVlITQaDBBQWIaxdz5i1KLpJGgBUdvgUmlJQ-Y&quot;,
+          &quot;allowCredentials&quot;: [
+            {
+              &quot;id&quot;: &quot;DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
+              &quot;type&quot;: &quot;public-key&quot;
+            }
+          ],
+          &quot;timeout&quot;: 300000,
+          &quot;userVerification&quot;: &quot;required&quot;
+        }
+      },
+      &quot;setCookie&quot;: &quot;[REDACTED]&quot;
+    }
+  },
+  {
+    &quot;request&quot;: {
+      &quot;method&quot;: &quot;POST&quot;,
+      &quot;path&quot;: &quot;/api/auth/login/verify&quot;,
+      &quot;body&quot;: {
+        &quot;ceremonyId&quot;: &quot;23129188-7673-4143-bcb3-9c08103e2046&quot;,
+        &quot;response&quot;: {
+          &quot;id&quot;: &quot;DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
+          &quot;rawId&quot;: &quot;DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
+          &quot;type&quot;: &quot;public-key&quot;,
+          &quot;authenticatorAttachment&quot;: &quot;platform&quot;,
+          &quot;clientExtensionResults&quot;: {},
+          &quot;response&quot;: {
+            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiNllrM2xXVmxJVFFhREJCUVdJYXhkejVpMUtMcEpHZ0JVZHZnVW1sSlEtWSIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
+            &quot;authenticatorData&quot;: &quot;jM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs0FAAAAAQ&quot;,
+            &quot;signature&quot;: &quot;MEYCIQCdOo0Vi8T7ISDae3bjFlRz4YSTVCWxyQHWzTG4SBxpMwIhAJUPqCaTnfYGha2QdVPfE52jvsD8dXM5GH5hlSoSbRm9&quot;,
+            &quot;userHandle&quot;: &quot;MzMzNzBjOGMtZWRjNy00ZGEyLTgwMzctZWM5NWU5OTliZmQy&quot;
+          }
+        }
+      },
+      &quot;cookie&quot;: &quot;[REDACTED]&quot;
+    },
+    &quot;response&quot;: {
+      &quot;status&quot;: 200,
+      &quot;body&quot;: {
+        &quot;verified&quot;: true,
+        &quot;user&quot;: {
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
+          &quot;username&quot;: &quot;fixture_a&quot;
+        }
+      },
+      &quot;setCookie&quot;: &quot;[REDACTED]&quot;
+    }
+  },
+  {
+    &quot;request&quot;: {
+      &quot;method&quot;: &quot;GET&quot;,
+      &quot;path&quot;: &quot;/api/auth/me&quot;,
+      &quot;body&quot;: null,
+      &quot;cookie&quot;: &quot;[REDACTED]&quot;
+    },
+    &quot;response&quot;: {
+      &quot;status&quot;: 200,
+      &quot;body&quot;: {
+        &quot;user&quot;: {
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
+          &quot;username&quot;: &quot;fixture_a&quot;
+        },
+        &quot;credential&quot;: {
+          &quot;id&quot;: &quot;DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
+          &quot;name&quot;: &quot;자동 시험 예비 키&quot;
+        },
+        &quot;expiresAt&quot;: &quot;2026-10-27T06:16:23.692Z&quot;
+      },
+      &quot;setCookie&quot;: null
+    }
+  },
+  {
+    &quot;request&quot;: {
+      &quot;method&quot;: &quot;POST&quot;,
+      &quot;path&quot;: &quot;/api/auth/login/options&quot;,
+      &quot;body&quot;: {},
+      &quot;cookie&quot;: &quot;[REDACTED]&quot;
+    },
+    &quot;response&quot;: {
+      &quot;status&quot;: 200,
+      &quot;body&quot;: {
+        &quot;ceremonyId&quot;: &quot;f52be220-45ec-4600-8475-767e17206c09&quot;,
+        &quot;options&quot;: {
+          &quot;rpId&quot;: &quot;t08.example.test&quot;,
+          &quot;challenge&quot;: &quot;Lfj0rjunK9HeNzxlWkPfARyUAPmNrjSXxF8EDMvHfno&quot;,
+          &quot;timeout&quot;: 300000,
+          &quot;userVerification&quot;: &quot;required&quot;
+        }
+      },
+      &quot;setCookie&quot;: &quot;[REDACTED]&quot;
+    }
+  },
+  {
+    &quot;request&quot;: {
+      &quot;method&quot;: &quot;POST&quot;,
+      &quot;path&quot;: &quot;/api/auth/login/verify&quot;,
+      &quot;body&quot;: {
+        &quot;ceremonyId&quot;: &quot;f52be220-45ec-4600-8475-767e17206c09&quot;,
+        &quot;response&quot;: {
+          &quot;id&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
+          &quot;rawId&quot;: &quot;iQeAwdmppo2mfWgOVCjxSa7j6T49tQA-2Lfq5XlmtZE&quot;,
+          &quot;type&quot;: &quot;public-key&quot;,
+          &quot;authenticatorAttachment&quot;: &quot;platform&quot;,
+          &quot;clientExtensionResults&quot;: {},
+          &quot;response&quot;: {
+            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiTGZqMHJqdW5LOUhlTnp4bFdrUGZBUnlVQVBtTnJqU1h4RjhFRE12SGZubyIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
             &quot;authenticatorData&quot;: &quot;jM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs0FAAAABA&quot;,
-            &quot;signature&quot;: &quot;MEYCIQC5jdIuwWhToTi-AYbGtm00hOaT0CM-sUIcg-FbwKuxaQIhAKKYx9aFaUjZmsp4YM4y4055a_X6odRF6GomJI04L5xH&quot;,
-            &quot;userHandle&quot;: &quot;NzlmZGFjMDItNGE1Yi00NjBlLWEzYzQtM2FmNjcwMDc5OTQz&quot;
+            &quot;signature&quot;: &quot;MEQCIEp5doxvqY43q3v0tA5k2nIv9DZCQPaR_8lC_eUK0bh6AiBQvErIIDKY0AyAPyk6cJDwl9FAbgxrvAlK8NHDlkZHiA&quot;,
+            &quot;userHandle&quot;: &quot;MzMzNzBjOGMtZWRjNy00ZGEyLTgwMzctZWM5NWU5OTliZmQy&quot;
           }
         }
       },
@@ -1317,10 +1462,10 @@
     &quot;response&quot;: {
       &quot;status&quot;: 200,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;883f6cf8-cfee-4685-bbe6-2002cec8ab56&quot;,
+        &quot;ceremonyId&quot;: &quot;8158097a-8ff8-4d4a-a4db-a10321ab6952&quot;,
         &quot;options&quot;: {
           &quot;rpId&quot;: &quot;t08.example.test&quot;,
-          &quot;challenge&quot;: &quot;8cM0wfANmaRUaZyq04ifUKNM0f_UIhY1eJEcdZY1Gls&quot;,
+          &quot;challenge&quot;: &quot;GfuSKbdoUMGWnVxbWmKOkNP8W7Q6o_1YPKXWV5cRthM&quot;,
           &quot;timeout&quot;: 300000,
           &quot;userVerification&quot;: &quot;required&quot;
         }
@@ -1333,18 +1478,18 @@
       &quot;method&quot;: &quot;POST&quot;,
       &quot;path&quot;: &quot;/api/auth/login/verify&quot;,
       &quot;body&quot;: {
-        &quot;ceremonyId&quot;: &quot;883f6cf8-cfee-4685-bbe6-2002cec8ab56&quot;,
+        &quot;ceremonyId&quot;: &quot;8158097a-8ff8-4d4a-a4db-a10321ab6952&quot;,
         &quot;response&quot;: {
-          &quot;id&quot;: &quot;xrjko8xNJqXVsugQLQYZrJDuk7zpkNY3hjbQgfOOJHE&quot;,
-          &quot;rawId&quot;: &quot;xrjko8xNJqXVsugQLQYZrJDuk7zpkNY3hjbQgfOOJHE&quot;,
+          &quot;id&quot;: &quot;DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
+          &quot;rawId&quot;: &quot;DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
           &quot;type&quot;: &quot;public-key&quot;,
           &quot;authenticatorAttachment&quot;: &quot;platform&quot;,
           &quot;clientExtensionResults&quot;: {},
           &quot;response&quot;: {
-            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiOGNNMHdmQU5tYVJVYVp5cTA0aWZVS05NMGZfVUloWTFlSkVjZFpZMUdscyIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
-            &quot;authenticatorData&quot;: &quot;jM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs0FAAAAAQ&quot;,
-            &quot;signature&quot;: &quot;MEUCIG8b7T2ZPXqRzGHg-4bcGg_KX0Ajgd94mH6n6JXRadXkAiEA1sUfePd6K66tjGvr1cpXejUqaHn8C63ej-GlqvO-Pyc&quot;,
-            &quot;userHandle&quot;: &quot;NzlmZGFjMDItNGE1Yi00NjBlLWEzYzQtM2FmNjcwMDc5OTQz&quot;
+            &quot;clientDataJSON&quot;: &quot;eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiR2Z1U0tiZG9VTUdXblZ4YldtS09rTlA4VzdRNm9fMVlQS1hXVjVjUnRoTSIsIm9yaWdpbiI6Imh0dHBzOi8vdDA4LmV4YW1wbGUudGVzdCIsImNyb3NzT3JpZ2luIjpmYWxzZX0&quot;,
+            &quot;authenticatorData&quot;: &quot;jM9DAFzd5X5gsBSzqGJpAmARyTnJPYYSUepabsUKHs0FAAAAAg&quot;,
+            &quot;signature&quot;: &quot;MEUCIG1sjy_AdYgZa71nnLpDyHxz9Jly_XVNcKGsAQj4p6s7AiEAzv7BlS4THW6DG-98spd78MgJAm3xsKK8R9i_kJ17xNg&quot;,
+            &quot;userHandle&quot;: &quot;MzMzNzBjOGMtZWRjNy00ZGEyLTgwMzctZWM5NWU5OTliZmQy&quot;
           }
         }
       },
@@ -1355,7 +1500,7 @@
       &quot;body&quot;: {
         &quot;verified&quot;: true,
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;username&quot;: &quot;fixture_a&quot;
         }
       },
@@ -1373,14 +1518,14 @@
       &quot;status&quot;: 200,
       &quot;body&quot;: {
         &quot;user&quot;: {
-          &quot;id&quot;: &quot;79fdac02-4a5b-460e-a3c4-3af670079943&quot;,
+          &quot;id&quot;: &quot;33370c8c-edc7-4da2-8037-ec95e999bfd2&quot;,
           &quot;username&quot;: &quot;fixture_a&quot;
         },
         &quot;credential&quot;: {
-          &quot;id&quot;: &quot;xrjko8xNJqXVsugQLQYZrJDuk7zpkNY3hjbQgfOOJHE&quot;,
+          &quot;id&quot;: &quot;DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
           &quot;name&quot;: &quot;자동 시험 예비 키&quot;
         },
-        &quot;expiresAt&quot;: &quot;2026-10-27T05:41:25.974Z&quot;
+        &quot;expiresAt&quot;: &quot;2026-10-27T06:16:23.722Z&quot;
       },
       &quot;setCookie&quot;: null
     }
@@ -1388,7 +1533,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;DELETE&quot;,
-      &quot;path&quot;: &quot;/api/credentials/xrjko8xNJqXVsugQLQYZrJDuk7zpkNY3hjbQgfOOJHE&quot;,
+      &quot;path&quot;: &quot;/api/credentials/DgTfyJMSRDp5NdFkE2LaLGb4sLb9aNcRhRfujUY5Sl0&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },
@@ -1403,7 +1548,7 @@
   {
     &quot;request&quot;: {
       &quot;method&quot;: &quot;DELETE&quot;,
-      &quot;path&quot;: &quot;/api/credentials/VUSkPh-6U_FVFktTonN8Wrp3w0poyXrSInDHkGC-iws&quot;,
+      &quot;path&quot;: &quot;/api/credentials/mn_erEvFNJbncKaivlZL27bjaP4CZXFFUfgdSADAOvA&quot;,
       &quot;body&quot;: null,
       &quot;cookie&quot;: &quot;[REDACTED]&quot;
     },

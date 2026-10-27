@@ -52,6 +52,14 @@ export async function verify(x) {
   const firstID = Buffer.from(A.key.id).toString('base64url');
   const secondID = Buffer.from(second.id).toString('base64url');
   check('첫 번째 키 삭제', (await a.api('/api/credentials/' + firstID, 'DELETE')).status, 200);
+  const directed = x.browser();
+  const requestA = () => directed.api('/api/auth/login/options', 'POST', { username: 'fixture_a' });
+  const requestWrong = await requestA();
+  check('아이디 지정 로그인은 삭제 키를 제외하고 남은 키만 요청', requestWrong.data.options.allowCredentials.map(k => k.id), [secondID]);
+  check('A 지정 질문에 B의 정상 서명도 거부', (await directed.api('/api/auth/login/verify', 'POST', { ceremonyId: requestWrong.data.ceremonyId, response: B.key.login(requestWrong.data.options, x.origin) })).status, 401);
+  const requestGood = await requestA();
+  check('아이디 지정 후 남은 예비 키로 로그인 허용', (await directed.api('/api/auth/login/verify', 'POST', { ceremonyId: requestGood.data.ceremonyId, response: second.login(requestGood.data.options, x.origin) })).status, 200);
+  check('아이디 지정 로그인은 지정한 A 계정으로만 연결', (await directed.api('/api/auth/me')).data.user.username, 'fixture_a');
   const removed = await login(a, A.key); check('삭제한 키 로그인 거부', removed.result.status, 401);
   const remains = await login(a, second); check('남은 키 로그인 허용', remains.result.status, 200);
   check('예비 키 로그인 뒤 실제 인증 키 표시', (await a.api('/api/auth/me')).data.credential.id, add.data.credential.id);

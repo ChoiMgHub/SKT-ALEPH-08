@@ -195,10 +195,20 @@ async function api(req, env, cfg, now) {
     return out;
   }
   if (path === '/api/auth/login/options' && req.method === 'POST') {
-    await body(req); await rateLimit(req, db, now);
-    // Discoverable credential: 공개 API에서 아이디별 패스키 목록을 노출하지 않는다.
-    const options = await generateAuthenticationOptions({ rpID: cfg.rpID, timeout: CHALLENGE_MS, userVerification: 'required' });
-    const issued = await issueChallenge(req, db, cfg, now, { kind: 'login' }, options.challenge);
+    const input = await body(req); await rateLimit(req, db, now);
+    let userID = null, allowCredentials;
+    if (input.username !== undefined && input.username !== '') {
+      const username = text(input.username, 3, 32, '가상 아이디를 3~32자로 입력하세요.').normalize('NFKC').toLowerCase();
+      if (!/^[a-z0-9_-]{3,32}$/.test(username)) fail(400, '아이디에는 영문 소문자·숫자·밑줄·하이픈을 사용하세요.');
+      const user = await first(db, 'SELECT id FROM users WHERE username=?', username);
+      userID = user?.id || crypto.randomUUID();
+      const keys = user ? await all(db, 'SELECT id FROM credentials WHERE user_id=? ORDER BY created_at,id', user.id) : [];
+      // 이름·공개키·메모는 공개하지 않는다. 없는 아이디에도 같은 응답 형태의 가상 후보를 준다.
+      allowCredentials = keys.length ? keys.map(key => ({ id: key.id })) : [{ id: random() }];
+    }
+    // 아이디를 비우면 기존 discoverable login, 입력하면 서버에 남은 해당 계정 키만 요청한다.
+    const options = await generateAuthenticationOptions({ rpID: cfg.rpID, timeout: CHALLENGE_MS, userVerification: 'required', allowCredentials });
+    const issued = await issueChallenge(req, db, cfg, now, { kind: 'login', userID }, options.challenge);
     const out = json({ ceremonyId: issued.id, options });
     out.headers.append('Set-Cookie', setCookie(cfg.flowName, issued.flow, 600, cfg)); return out;
   }
@@ -207,6 +217,7 @@ async function api(req, env, cfg, now) {
     const response = verifiedResponse(input);
     const stored = await first(db, 'SELECT c.*,u.username FROM credentials c JOIN users u ON u.id=c.user_id WHERE c.id=?', response.id);
     if (!stored) fail(401, '패스키 로그인 확인에 실패했습니다.');
+    if (c.user_id && stored.user_id !== c.user_id) fail(401, '패스키 로그인 확인에 실패했습니다.');
     if (response.response?.userHandle && response.response.userHandle !== to64(enc.encode(stored.user_id))) fail(401, '패스키 로그인 확인에 실패했습니다.');
     let verification;
     try { verification = await verifyAuthenticationResponse({ response, expectedChallenge: c.challenge, expectedOrigin: cfg.origin,

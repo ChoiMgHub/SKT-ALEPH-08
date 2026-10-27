@@ -348,6 +348,8 @@
       <p class="notice">학원 PC의 Windows 계정 설정을 바꿀 필요는 없습니다. 갤럭시 Chrome에서 이 HTTPS 사이트를 직접 열고 지문·패턴·PIN으로 패스키 사용을 승인할 수 있습니다.</p>
       <p id="status" role="status" aria-live="polite">로그인 상태를 확인하고 있습니다.</p>
       <div id="anonymous-panel" hidden>
+        <label>로그인할 가상 아이디 (선택)<input id="login-username" name="loginUsername" autocomplete="username" maxlength="32" placeholder="예: learner_a" /></label>
+        <p class="desc">삭제한 키가 기기 목록에 남아 로그인이 실패하면 아이디를 입력하세요. 서버에 남아 있는 해당 계정의 키만 요청합니다. 비밀번호는 필요하지 않습니다.</p>
         <button id="login-btn" type="button">기존 패스키로 로그인</button>
         <details>
           <summary>처음 사용하나요? 가상 계정과 패스키 만들기</summary>

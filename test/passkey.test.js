@@ -195,3 +195,26 @@ test('session reports the credential that authenticated it, not the latest-added
     assert.equal((await a.api('/api/auth/me')).data.credential.id, firstID);
   } finally { x.close(); }
 });
+test('account-directed login excludes deleted credentials and binds the challenge to the requested account', async () => {
+  const x = await context();
+  try {
+    const a = x.browser(), b = x.browser(), anon = x.browser();
+    const A = await signup(a, 'fixture_a'), B = await signup(b, 'fixture_b'), two = new SoftwareAuthenticator();
+    const p = await a.api('/api/auth/registration/options', 'POST', { mode: 'add', name: '남은 예비 키', provider: '기타·확인 필요' });
+    const added = await a.api('/api/auth/registration/verify', 'POST', { mode: 'add', ceremonyId: p.data.ceremonyId, response: two.register(p.data.options, x.env.ORIGIN) });
+    assert.equal((await a.api('/api/credentials/' + A.result.data.credential.id, 'DELETE')).status, 200);
+    const begin = name => anon.api('/api/auth/login/options', 'POST', { username: name });
+    const wrong = await begin('FIXTURE_A');
+    assert.deepEqual(wrong.data.options.allowCredentials.map(k => k.id), [added.data.credential.id]);
+    // 클라이언트가 후보 필터를 무시하고 B의 올바른 서명을 보내도 A 로그인으로 인정하면 안 된다.
+    assert.equal((await anon.api('/api/auth/login/verify', 'POST', { ceremonyId: wrong.data.ceremonyId, response: B.key.login(wrong.data.options, x.env.ORIGIN) })).status, 401);
+    const unknown = await begin('unknown_account');
+    assert.equal(unknown.status, 200); assert.equal(unknown.data.options.allowCredentials.length, 1);
+    assert.equal((await anon.api('/api/auth/login/verify', 'POST', { ceremonyId: unknown.data.ceremonyId, response: two.login(unknown.data.options, x.env.ORIGIN) })).status, 401);
+    const good = await begin('fixture_a');
+    assert.equal((await anon.api('/api/auth/login/verify', 'POST', { ceremonyId: good.data.ceremonyId, response: two.login(good.data.options, x.env.ORIGIN) })).status, 200);
+    const me = (await anon.api('/api/auth/me')).data;
+    assert.equal(me.user.username, 'fixture_a'); assert.equal(me.credential.name, '남은 예비 키');
+    assert.equal((await b.api('/api/auth/me')).data.user.username, 'fixture_b');
+  } finally { x.close(); }
+});
