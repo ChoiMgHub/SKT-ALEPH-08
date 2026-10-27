@@ -64,3 +64,49 @@ test('backgrounding a shared PC tab clears private DOM; no pending response may 
     assert.equal(ui.doc.getElementById('items').children.length, 0); assert.equal(ui.doc.getElementById('private-panel').hidden, true);
   } finally { ui?.dom.window.close(); x.close(); }
 });
+test('expired recent authentication displays the reason next to the add-key button without calling the authenticator', async () => {
+  const x = await context(); let ui;
+  try {
+    const browser = x.browser(); await signup(browser, 'fixture_a'); x.clock.now += 5 * 60_000;
+    let called = false;
+    ui = await app(x, browser, { register: async () => { called = true; throw new Error('must not open'); } });
+    const form = ui.doc.getElementById('add-key-form'); form.elements.name.value = '예비 키'; form.elements.provider.value = '기타·확인 필요';
+    form.dispatchEvent(new ui.dom.window.Event('submit', { cancelable: true })); await settled(ui.doc);
+    assert.equal(called, false);
+    const inline = ui.doc.getElementById('add-key-status');
+    assert.ok(inline, 'the error must be visible beside the button, not only above all private notes');
+    assert.match(inline.textContent, /다시 로그인.*5분/);
+    assert.equal(ui.doc.getElementById('private-panel').hidden, false);
+  } finally { ui?.dom.window.close(); x.close(); }
+});
+test('fresh add-key UI calls the authenticator and lists two distinct credentials', async () => {
+  const x = await context(); let ui;
+  try {
+    const browser = x.browser(); await signup(browser, 'fixture_a'); const two = new SoftwareAuthenticator();
+    ui = await app(x, browser, { register: async ({ optionsJSON }) => two.register(optionsJSON, x.env.ORIGIN) });
+    const form = ui.doc.getElementById('add-key-form'); form.elements.name.value = '예비 키'; form.elements.provider.value = '기타·확인 필요';
+    form.dispatchEvent(new ui.dom.window.Event('submit', { cancelable: true })); await settled(ui.doc);
+    assert.equal(ui.doc.querySelectorAll('#credentials article').length, 2);
+    assert.match(ui.doc.getElementById('add-key-status').textContent, /새 패스키를 추가했습니다/);
+    assert.equal(ui.doc.getElementById('add-key-status').dataset.state, 'info');
+  } finally { ui?.dom.window.close(); x.close(); }
+});
+test('device window rejection displays inline and restores private UI after visibility changes', async () => {
+  const x = await context(); let ui;
+  try {
+    const browser = x.browser(); await signup(browser, 'fixture_a');
+    ui = await app(x, browser, { register: async () => {
+      Object.defineProperty(ui.doc, 'visibilityState', { configurable: true, value: 'hidden' });
+      ui.doc.dispatchEvent(new ui.dom.window.Event('visibilitychange'));
+      Object.defineProperty(ui.doc, 'visibilityState', { configurable: true, value: 'visible' });
+      ui.doc.dispatchEvent(new ui.dom.window.Event('visibilitychange'));
+      throw Object.assign(new Error('duplicate'), { name: 'InvalidStateError' });
+    } });
+    const form = ui.doc.getElementById('add-key-form'); form.elements.name.value = '예비 키'; form.elements.provider.value = '기타·확인 필요';
+    form.dispatchEvent(new ui.dom.window.Event('submit', { cancelable: true })); await settled(ui.doc);
+    assert.match(ui.doc.getElementById('add-key-status').textContent, /이미 등록된 패스키/);
+    assert.equal(ui.doc.getElementById('add-key-status').dataset.state, 'error');
+    assert.equal(ui.doc.getElementById('private-panel').hidden, false);
+    assert.equal(ui.doc.querySelectorAll('#credentials article').length, 1);
+  } finally { ui?.dom.window.close(); x.close(); }
+});

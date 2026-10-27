@@ -3,8 +3,11 @@ import { startRegistration, startAuthentication, browserSupportsWebAuthn } from 
 export function mount({ doc = document, fetcher = fetch, register = startRegistration, authenticate = startAuthentication,
   supported = browserSupportsWebAuthn, download } = {}) {
   const $ = id => doc.getElementById(id);
-  let currentUser = null, evidence = [], busy = false, generation = 0, timer;
-  const status = message => { $('status').textContent = message; };
+  let currentUser = null, evidence = [], busy = false, generation = 0, timer, activeStatus = null, restoreOnVisible = false;
+  const status = (message, state = 'info') => {
+    $('status').textContent = message;
+    if (activeStatus) { activeStatus.textContent = message; activeStatus.dataset.state = state; }
+  };
   const journal = (path, method, request, response, code) => {
     evidence.push({ at: new Date().toISOString(), request: { path, method, body: request ?? null }, response: { status: code, body: response } });
     if (evidence.length > 150) evidence.shift();
@@ -17,9 +20,17 @@ export function mount({ doc = document, fetcher = fetch, register = startRegistr
     if (clearJournal) evidence = [];
   }
   async function api(path, method = 'GET', value, record = true) {
-    const response = await fetcher(path, { method, credentials: 'same-origin', cache: 'no-store',
-      headers: method === 'GET' ? {} : { 'Content-Type': 'application/json' }, body: value === undefined ? undefined : JSON.stringify(value) });
-    const result = await response.json();
+    const controller = new AbortController();
+    const timeout = doc.defaultView.setTimeout(() => controller.abort(), 20_000);
+    let response, result;
+    try {
+      response = await fetcher(path, { method, credentials: 'same-origin', cache: 'no-store', signal: controller.signal,
+        headers: method === 'GET' ? {} : { 'Content-Type': 'application/json' }, body: value === undefined ? undefined : JSON.stringify(value) });
+      result = await response.json();
+    } catch (e) {
+      if (e.name === 'AbortError') throw new Error('20초 동안 서버 응답이 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.');
+      throw new Error('서버와 통신하지 못했습니다. 인터넷 연결을 확인하고 다시 시도하세요.');
+    } finally { doc.defaultView.clearTimeout(timeout); }
     if (record) journal(path, method, value, result, response.status);
     if (!response.ok) {
       if (response.status === 401 && !path.includes('/registration/verify') && !path.includes('/login/verify')) clearPrivate();
@@ -34,11 +45,20 @@ export function mount({ doc = document, fetcher = fetch, register = startRegistr
     const button = element('button', label, parent); button.type = 'button';
     button.addEventListener('click', () => perform(callback)); return button;
   }
-  async function perform(task) {
+  async function perform(task, statusID = null) {
     if (busy) return; busy = true;
+    activeStatus = statusID ? $(statusID) : null;
+    if (activeStatus) status('추가 등록 요청을 준비하고 있습니다.');
     doc.querySelectorAll('.passkey-wrap button').forEach(b => { b.disabled = true; });
-    try { await task(); } catch (e) { status(e.message || '작업에 실패했습니다.'); }
-    finally { busy = false; doc.querySelectorAll('.passkey-wrap button').forEach(b => { b.disabled = false; }); }
+    try { await task(); } catch (e) { status(e.message || '작업에 실패했습니다.', 'error'); }
+    finally {
+      if (restoreOnVisible && doc.visibilityState !== 'hidden') {
+        restoreOnVisible = false;
+        if (!currentUser) await refresh().catch(() => {});
+      }
+      activeStatus = null; busy = false;
+      doc.querySelectorAll('.passkey-wrap button').forEach(b => { b.disabled = false; });
+    }
   }
   function showItems(items) {
     $('items').replaceChildren();
@@ -87,8 +107,9 @@ export function mount({ doc = document, fetcher = fetch, register = startRegistr
   async function registration(form, mode) {
     if (!supported()) throw new Error('이 브라우저에서 패스키를 지원하지 않습니다. 갤럭시 Chrome의 HTTPS 주소로 접속하세요.');
     const values = Object.fromEntries(new doc.defaultView.FormData(form));
-    status('기기의 패스키 등록 창에서 저장할 곳을 선택하세요.');
+    status('서버에 새 패스키 등록 질문을 요청하고 있습니다.');
     const pending = await api('/api/auth/registration/options', 'POST', { mode, ...values });
+    status('기기의 패스키 등록 창을 기다리고 있습니다. 저장할 곳을 선택하세요.');
     let response;
     try { response = await register({ optionsJSON: pending.options }); }
     catch (e) {
@@ -101,8 +122,8 @@ export function mount({ doc = document, fetcher = fetch, register = startRegistr
     await api('/api/auth/registration/verify', 'POST', { mode, ceremonyId: pending.ceremonyId, response });
     form.reset(); await refresh(); status(mode === 'signup' ? '패스키 등록과 로그인을 완료했습니다. 아래 가상 메모를 확인하세요.' : '현재 계정에 새 패스키를 추가했습니다.');
   }
-  $('signup-form').addEventListener('submit', e => { e.preventDefault(); perform(() => registration(e.currentTarget, 'signup')); });
-  $('add-key-form').addEventListener('submit', e => { e.preventDefault(); perform(() => registration(e.currentTarget, 'add')); });
+  $('signup-form').addEventListener('submit', e => { e.preventDefault(); const form = e.currentTarget; perform(() => registration(form, 'signup')); });
+  $('add-key-form').addEventListener('submit', e => { e.preventDefault(); const form = e.currentTarget; perform(() => registration(form, 'add'), 'add-key-status'); });
   $('login-btn').addEventListener('click', () => perform(async () => {
     if (!supported()) throw new Error('패스키를 지원하는 브라우저에서 HTTPS 주소로 접속하세요.');
     clearPrivate(); status('기기에서 로그인할 패스키를 선택하세요.');
@@ -134,8 +155,12 @@ export function mount({ doc = document, fetcher = fetch, register = startRegistr
   doc.addEventListener('visibilitychange', () => {
     if (doc.visibilityState === 'hidden') {
       // 공유 PC의 탭 미리보기와 재표시에서도 오래된 비공개 DOM을 남기지 않는다.
+      restoreOnVisible = Boolean(currentUser || busy);
       clearPrivate();
-    } else if (!busy) refresh().then(() => status('로그인 상태를 확인했습니다.')).catch(() => status('패스키로 로그인하세요.'));
+    } else if (!busy) {
+      restoreOnVisible = false;
+      refresh().then(() => status('로그인 상태를 확인했습니다.')).catch(() => status('패스키로 로그인하세요.'));
+    }
   });
   const copyBtn = $('copy-btn');
   copyBtn.addEventListener('click', async () => {
