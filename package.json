@@ -14,7 +14,8 @@
     "db:local": "wrangler d1 execute aleph-profile-08 --local --file=./schema.sql",
     "db:remote": "wrangler d1 execute aleph-profile-08 --remote --file=./schema.sql",
     "test": "node --test --test-concurrency=1",
-    "evidence:build": "npm run build && node scripts/generate-evidence.mjs"
+    "evidence:build": "npm run build && node scripts/generate-evidence.mjs",
+    "verify:remote": "node scripts/verify-remote.mjs"
   },
   "dependencies": {
     "@simplewebauthn/browser": "14.0.0",

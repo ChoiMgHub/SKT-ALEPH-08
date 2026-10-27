@@ -1,15 +1,17 @@
 import assert from 'node:assert/strict';
 import { signup, login, SoftwareAuthenticator } from './helpers.mjs';
-export async function verify(x) {
+export async function verify(x, { usernameA = 'fixture_a', usernameB = 'fixture_b', fixtures = [] } = {}) {
   const checks = [], pairs = [];
   function check(label, actual, expected) { assert.deepEqual(actual, expected, label); checks.push({ label, passed: true }); }
   const a = x.browser(), b = x.browser(), anon = x.browser();
-  const beforeRegistration = await a.api('/api/auth/registration/options', 'POST', { mode: 'signup', username: 'fixture_a', name: '취소할 자동 시험 키', provider: '기타·확인 필요' });
+  const beforeRegistration = await a.api('/api/auth/registration/options', 'POST', { mode: 'signup', username: usernameA, name: '취소할 자동 시험 키', provider: '기타·확인 필요' });
   check('취소할 등록 질문 발급', beforeRegistration.status, 200);
   check('등록 취소', (await a.api('/api/auth/cancel', 'POST', { ceremonyId: beforeRegistration.data.ceremonyId })).status, 200);
-  const A = await signup(a, 'fixture_a'); check('A 등록 검증 성공', A.result.status, 201);
+  const A = await signup(a, usernameA);
+  const fixtureA = { actor: a, username: usernameA, keys: [A.key] }; fixtures.push(fixtureA);
+  check('A 등록 검증 성공', A.result.status, 201);
   check('A 세션에 실제 등록 인증 키 표시', (await a.api('/api/auth/me')).data.credential.id, A.result.data.credential.id);
-  const B = await signup(b, 'fixture_b'); check('B 등록 검증 성공', B.result.status, 201);
+  const B = await signup(b, usernameB); fixtures.push({ actor: b, username: usernameB, keys: [B.key] }); check('B 등록 검증 성공', B.result.status, 201);
   check('등록마다 새 질문', A.pending.data.options.challenge === B.pending.data.options.challenge, false);
   const aData = (await a.api('/api/private')).data, bData = (await b.api('/api/private')).data;
   check('A 가상 메모 세 개', aData.items.length, 3); check('B 가상 메모 세 개', bData.items.length, 3);
@@ -43,6 +45,7 @@ export async function verify(x) {
   check('로그아웃 뒤 옛 쿠키 재전송 거부', (await a.api('/api/private', 'GET', undefined, { cookieOverride: oldCookie })).status, 401);
   check('기존 키 재로그인', (await login(a, A.key)).result.status, 200);
   const second = new SoftwareAuthenticator();
+  fixtureA.keys.push(second);
   const options = await a.api('/api/auth/registration/options', 'POST', { mode: 'add', name: '자동 시험 예비 키', provider: '기타·확인 필요' });
   const add = await a.api('/api/auth/registration/verify', 'POST', { mode: 'add', ceremonyId: options.data.ceremonyId, response: second.register(options.data.options, x.origin) });
   check('두 번째 키 등록', add.status, 201);
@@ -53,13 +56,13 @@ export async function verify(x) {
   const secondID = Buffer.from(second.id).toString('base64url');
   check('첫 번째 키 삭제', (await a.api('/api/credentials/' + firstID, 'DELETE')).status, 200);
   const directed = x.browser();
-  const requestA = () => directed.api('/api/auth/login/options', 'POST', { username: 'fixture_a' });
+  const requestA = () => directed.api('/api/auth/login/options', 'POST', { username: usernameA });
   const requestWrong = await requestA();
   check('아이디 지정 로그인은 삭제 키를 제외하고 남은 키만 요청', requestWrong.data.options.allowCredentials.map(k => k.id), [secondID]);
   check('A 지정 질문에 B의 정상 서명도 거부', (await directed.api('/api/auth/login/verify', 'POST', { ceremonyId: requestWrong.data.ceremonyId, response: B.key.login(requestWrong.data.options, x.origin) })).status, 401);
   const requestGood = await requestA();
   check('아이디 지정 후 남은 예비 키로 로그인 허용', (await directed.api('/api/auth/login/verify', 'POST', { ceremonyId: requestGood.data.ceremonyId, response: second.login(requestGood.data.options, x.origin) })).status, 200);
-  check('아이디 지정 로그인은 지정한 A 계정으로만 연결', (await directed.api('/api/auth/me')).data.user.username, 'fixture_a');
+  check('아이디 지정 로그인은 지정한 A 계정으로만 연결', (await directed.api('/api/auth/me')).data.user.username, usernameA);
   const removed = await login(a, A.key); check('삭제한 키 로그인 거부', removed.result.status, 401);
   const remains = await login(a, second); check('남은 키 로그인 허용', remains.result.status, 200);
   check('예비 키 로그인 뒤 실제 인증 키 표시', (await a.api('/api/auth/me')).data.credential.id, add.data.credential.id);
@@ -68,7 +71,7 @@ export async function verify(x) {
   check('마지막 키 삭제 차단', (await a.api('/api/credentials/' + secondID, 'DELETE')).status, 409);
   const invalidKey = await a.api('/api/credentials/' + Buffer.from(B.key.id).toString('base64url'), 'DELETE');
   check('다른 계정 키 삭제 차단', invalidKey.status, 403);
-  check('A 시험 계정 정리', (await a.api('/api/account', 'DELETE', { confirmUsername: 'fixture_a' })).status, 200);
-  check('B 시험 계정 정리', (await b.api('/api/account', 'DELETE', { confirmUsername: 'fixture_b' })).status, 200);
+  check('A 시험 계정 정리', (await a.api('/api/account', 'DELETE', { confirmUsername: usernameA })).status, 200);
+  check('B 시험 계정 정리', (await b.api('/api/account', 'DELETE', { confirmUsername: usernameB })).status, 200);
   return { checks, pairs, keys };
 }

@@ -9,6 +9,9 @@ test('C10-C18: public source has no private items; anonymous API and direct page
     const a = x.browser(); await signup(a, 'fixture_a');
     const anon = x.browser(), home = await anon.api('/');
     assert.equal(home.status, 200); assert.match(home.data, /AI 인프라/); assert.doesNotMatch(home.data, /fixture_a의 연습 자료/);
+    assert.match(home.data, /학습자 A/); assert.match(home.data, /가명/);
+    assert.match(home.data, /학습자 A\(가명\) \| AI 인프라 엔지니어 소개/);
+    assert.match(home.data, /id="email-val"[^>]*>contact@example\.invalid/);
     assert.doesNotMatch(home.data, /가상 서버 점검 도구의 화면/);
     assert.equal((await anon.api('/api/private')).status, 401);
     const redirect = await anon.api('/private'); assert.equal(redirect.status, 302); assert.match(redirect.headers.get('location'), /#passkey-area$/);

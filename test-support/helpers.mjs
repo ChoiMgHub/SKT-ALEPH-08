@@ -91,14 +91,14 @@ export async function context() {
 export async function signup(c, username, key = new SoftwareAuthenticator()) {
   const pending = await c.api('/api/auth/registration/options', 'POST', { mode: 'signup', username, name: '자동 시험 기본 키', provider: '기타·확인 필요' });
   if (pending.status !== 200) throw new Error(JSON.stringify(pending.data));
-  const response = key.register(pending.data.options, 'https://t08.example.test');
+  const response = key.register(pending.data.options, c.origin || 'https://t08.example.test');
   const result = await c.api('/api/auth/registration/verify', 'POST', { mode: 'signup', ceremonyId: pending.data.ceremonyId, response });
   if (result.status !== 201) throw new Error(JSON.stringify(result.data));
   return { key, result, pending };
 }
 export async function login(c, key, opts = {}) {
   const pending = await c.api('/api/auth/login/options', 'POST', {});
-  const response = key.login(pending.data.options, opts.origin || 'https://t08.example.test', opts);
+  const response = key.login(pending.data.options, opts.origin || c.origin || 'https://t08.example.test', opts);
   const payload = { ceremonyId: pending.data.ceremonyId, response };
   return { result: await c.api('/api/auth/login/verify', 'POST', payload), payload, pending };
 }
